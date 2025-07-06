@@ -1,31 +1,74 @@
 package com.trading212.Trading212.model;
 
-import lombok.Getter;
-import lombok.Setter; // Add @Setter for updating price
-import lombok.NoArgsConstructor; // Add no-arg constructor
-import lombok.AllArgsConstructor; // Add all-args constructor
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Getter
-@Setter // Needed for setting ID after insert and updating price
-@NoArgsConstructor // Needed for JdbcTemplate row mapping and general use
-@AllArgsConstructor // Useful for creating instances easily
 public class CryptoCurrencyEntity {
 
     private Long id;
-    private String symbol; // e.g., "BTC", "ETH"
-    private String name; // e.g., "Bitcoin", "Ethereum"
-    private String krakenPairName; // e.g., "XBT/USD", "ETH/USD" - crucial for Kraken API
+    private String symbol;
+    private String name;
+    private String krakenPairName;
     private BigDecimal currentPrice;
     private LocalDateTime lastUpdated;
+
+    // No-argument constructor
+    public CryptoCurrencyEntity() {
+    }
 
     public CryptoCurrencyEntity(String symbol, String name, String krakenPairName, BigDecimal currentPrice) {
         this.symbol = symbol;
         this.name = name;
         this.krakenPairName = krakenPairName;
         this.currentPrice = currentPrice;
-        // lastUpdated will be handled by DB default or set on retrieval
+    }
+
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getKrakenPairName() {
+        return krakenPairName;
+    }
+
+    public void setKrakenPairName(String krakenPairName) {
+        this.krakenPairName = krakenPairName;
+    }
+
+    public BigDecimal getCurrentPrice() {
+        return currentPrice;
+    }
+
+    public void setCurrentPrice(BigDecimal currentPrice) {
+        this.currentPrice = currentPrice;
+    }
+
+    public LocalDateTime getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(LocalDateTime lastUpdated) {
+        this.lastUpdated = lastUpdated;
     }
 }

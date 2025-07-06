@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Trading Platform</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        .crypto-card {
+            transition: transform 0.2s;
+        }
+        .crypto-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .connection-status {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            vertical-align: middle;
+            transition: all 0.3s ease;
+        }
+        .connected {
+            background-color: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+        }
+        .disconnected {
+            background-color: #dc3545;
+            animation: pulse 2s infinite;
+        }
+        .connecting {
+            background-color: #ffc107;
+            animation: pulse 1.5s infinite;
+        }
+        
+        /* Price change animations */
+        @keyframes highlightGreen {
+            0% { background-color: rgba(40, 167, 69, 0.1); }
+            100% { background-color: transparent; }
+        }
+        @keyframes highlightRed {
+            0% { background-color: rgba(220, 53, 69, 0.1); }
+            100% { background-color: transparent; }
+        }
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+        
+        .price-up {
+            color: #28a745;
+            animation: highlightGreen 1.5s ease-out;
+        }
+        
+        .price-down {
+            color: #dc3545;
+            animation: highlightRed 1.5s ease-out;
+        }
+        
+        .card {
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Crypto Trading Platform</a>
+            <div class="d-flex align-items-center">
+                <span id="connectionStatus" class="connection-status disconnected me-2"></span>
+                <span id="connectionText" class="text-light">Disconnected</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-4">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2>Cryptocurrency Prices</h2>
+                    <div class="text-muted" id="lastUpdated">Last updated: --:--:--</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" id="cryptoContainer">
+            <!-- Crypto cards will be dynamically inserted here -->
+            <div class="col-12 text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Loading cryptocurrency data...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trade Modal -->
+    <div class="modal fade" id="tradeModal" tabindex="-1" aria-labelledby="tradeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tradeModalLabel">Trade</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Trading <span id="cryptoName">Cryptocurrency</span></p>
+                    <div class="mb-3">
+                        <label for="tradeAmount" class="form-label">Amount</label>
+                        <input type="number" class="form-control" id="tradeAmount" placeholder="0.00">
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-success" type="button">Buy</button>
+                        <button class="btn btn-danger" type="button">Sell</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
+    <!-- WebSocket Client Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    
+    <!-- WebSocket Client Implementation -->
+    <script>
+        // Utility functions
+        function formatPrice(price) {
+            if (price === undefined || price === null) return 'N/A';
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 8
+            }).format(price);
+        }
+
+        function formatPercentChange(change) {
+            if (change === undefined || change === null) return 'N/A';
+            const formatted = parseFloat(change).toFixed(2);
+            return parseFloat(change) >= 0 ? `+${formatted}%` : `${formatted}%`;
+        }
+
+        // WebSocket Client with enhanced error handling and logging
+        class WebSocketClient {
+            constructor() {
+                this.stompClient = null;
+                this.isConnected = false;
+                this.reconnectAttempts = 0;
+                this.maxReconnectAttempts = 10; // Increased max attempts
+                this.reconnectDelay = 3000;
+                this.subscriptions = new Map();
+                this.connectCallbacks = [];
+                this.errorCallbacks = [];
+                this.connectionPromise = null;
+                this.reconnectTimeout = null;
+            }
+
+            connect() {
+                // Return existing connection promise if already connecting/connected
+                if (this.connectionPromise) {
+                    return this.connectionPromise;
+                }
+
+                console.log('[WebSocket] Attempting to connect...');
+                
+                this.connectionPromise = new Promise((resolve, reject) => {
+                    try {
+                        const socket = new SockJS('http://localhost:8091/ws');
+                        this.stompClient = Stomp.over(socket);
+                        
+                        // Configure debug logging (can be enabled for troubleshooting)
+                        this.stompClient.debug = (message) => {
+                            // Uncomment to see STOMP frames
+                            // console.log('[STOMP]', message);
+                        };
+                        
+                        // Set heartbeat (important for keeping connection alive)
+                        this.stompClient.heartbeat.outgoing = 10000; // 10 seconds
+                        this.stompClient.heartbeat.incoming = 10000; // 10 seconds
+                        
+                        // Connection headers
+                        const headers = {
+                            'accept-version': '1.2',
+                            'heart-beat': '10000,10000'
+                        };
+                        
+                        // Connect to STOMP
+                        this.stompClient.connect(
+                            headers,
+                            (frame) => this.onConnect(frame, resolve),
+                            (error) => this.onError(error, reject)
+                        );
+                        
+                        // Handle WebSocket close events
+                        socket.onclose = (event) => {
+                            console.warn('[WebSocket] Connection closed:', event);
+                            this.handleDisconnect();
+                            this.scheduleReconnect();
+                        };
+                        
+                        // Handle WebSocket errors
+                        socket.onerror = (error) => {
+                            console.error('[WebSocket] Error:', error);
+                            this.handleDisconnect();
+                        };
+                        
+                    } catch (error) {
+                        console.error('[WebSocket] Connection setup error:', error);
+                        this.handleDisconnect();
+                        reject(error);
+                    }
+                });
+                
+                return this.connectionPromise;
+            }
+            
+            onConnect(frame, resolve) {
+                console.log('[WebSocket] Connected to STOMP endpoint');
+                console.log('[WebSocket] Protocol Version:', frame.headers.version);
+                console.log('[WebSocket] Server:', frame.headers.server);
+                
+                this.isConnected = true;
+                this.reconnectAttempts = 0;
+                
+                // Resubscribe to any existing subscriptions
+                this.subscriptions.forEach(({ callback, subscription }, destination) => {
+                    if (subscription) {
+                        try {
+                            subscription.unsubscribe();
+                        } catch (e) {
+                            console.warn(`[WebSocket] Error unsubscribing from ${destination}:`, e);
+                        }
+                    }
+                    this.subscribe(destination, callback);
+                });
+                
+                // Call all connect callbacks
+                this.connectCallbacks.forEach(cb => {
+                    try {
+                        cb();
+                    } catch (e) {
+                        console.error('[WebSocket] Error in connect callback:', e);
+                    }
+                });
+                
+                resolve();
+            }
+            
+            onError(error, reject) {
+                console.error('[WebSocket] Connection error:', error);
+                this.handleDisconnect();
+                this.scheduleReconnect(reject);
+            }
+            
+            handleDisconnect() {
+                this.isConnected = false;
+                if (this.stompClient) {
+                    try {
+                        this.stompClient.disconnect();
+                    } catch (e) {
+                        console.error('[WebSocket] Error during disconnect:', e);
+                    }
+                    this.stompClient = null;
+                }
+                this.connectionPromise = null;
+            }
+            
+            scheduleReconnect(reject) {
+                if (this.reconnectTimeout) {
+                    clearTimeout(this.reconnectTimeout);
+                }
+                
+                if (this.reconnectAttempts < this.maxReconnectAttempts) {
+                    this.reconnectAttempts++;
+                    const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000); // Exponential backoff with max 30s
+                    
+                    console.log(`[WebSocket] Reconnecting in ${delay/1000}s (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
+                    
+                    // Notify error callbacks
+                    this.errorCallbacks.forEach(cb => {
+                        try {
+                            cb(new Error(`Connection lost. Reconnecting in ${delay/1000}s (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`));
+                        } catch (e) {
+                            console.error('[WebSocket] Error in error callback:', e);
+                        }
+                    });
+                    
+                    this.reconnectTimeout = setTimeout(() => {
+                        this.connect().catch(error => {
+                            console.error('[WebSocket] Reconnection failed:', error);
+                            if (reject) reject(error);
+                        });
+                    }, delay);
+                } else {
+                    const errorMsg = 'Max reconnection attempts reached';
+                    console.error(`[WebSocket] ${errorMsg}`);
+                    this.errorCallbacks.forEach(cb => {
+                        try {
+                            cb(new Error(errorMsg));
+                        } catch (e) {
+                            console.error('[WebSocket] Error in error callback:', e);
+                        }
+                    });
+                    if (reject) reject(new Error(errorMsg));
+                }
+            }
+
+            subscribe(destination, callback) {
+                console.log(`[WebSocket] Subscribing to ${destination}`);
+                
+                // Store the subscription for reconnection
+                if (!this.subscriptions.has(destination)) {
+                    this.subscriptions.set(destination, { callback });
+                } else {
+                    this.subscriptions.get(destination).callback = callback;
+                }
+                
+                // If not connected, the subscription will be established on connect
+                if (!this.isConnected || !this.stompClient) {
+                    console.warn(`[WebSocket] Not connected. Subscription to ${destination} will be established once connected.`);
+                    return null;
+                }
+                
+                try {
+                    // Unsubscribe first if already subscribed
+                    if (this.subscriptions.get(destination).subscription) {
+                        try {
+                            this.subscriptions.get(destination).subscription.unsubscribe();
+                        } catch (e) {
+                            console.warn(`[WebSocket] Error unsubscribing from ${destination}:`, e);
+                        }
+                    }
+                    
+                    // Create new subscription
+                    const subscription = this.stompClient.subscribe(destination, (message) => {
+                        try {
+                            console.log(`[WebSocket] Received message on ${destination}:`, message);
+                            
+                            let data;
+                            try {
+                                data = JSON.parse(message.body);
+                            } catch (e) {
+                                console.error(`[WebSocket] Error parsing message from ${destination}:`, e);
+                                console.error('[WebSocket] Raw message:', message.body);
+                                return;
+                            }
+                            
+                            // Process the message
+                            try {
+                                callback(data);
+                            } catch (e) {
+                                console.error(`[WebSocket] Error in subscription callback for ${destination}:`, e);
+                                console.error('[WebSocket] Message data:', data);
+                            }
+                        } catch (e) {
+                            console.error(`[WebSocket] Unexpected error processing message from ${destination}:`, e);
+                        }
+                    });
+                    
+                    // Store the subscription
+                    this.subscriptions.get(destination).subscription = subscription;
+                    console.log(`[WebSocket] Successfully subscribed to ${destination}`);
+                    
+                    return subscription;
+                } catch (error) {
+                    console.error(`[WebSocket] Error subscribing to ${destination}:`, error);
+                    return null;
+                }
+            }
+
+            send(destination, headers = {}, body = {}) {
+                if (!this.isConnected || !this.stompClient) {
+                    throw new Error('Not connected to WebSocket server');
+                }
+                
+                try {
+                    const payload = JSON.stringify(body);
+                    console.log(`[WebSocket] Sending to ${destination}:`, payload);
+                    this.stompClient.send(destination, headers, payload);
+                } catch (error) {
+                    console.error(`[WebSocket] Error sending message to ${destination}:`, error);
+                    throw error;
+                }
+            }
+
+            disconnect() {
+                console.log('[WebSocket] Disconnecting...');
+                
+                // Clear any pending reconnection
+                if (this.reconnectTimeout) {
+                    clearTimeout(this.reconnectTimeout);
+                    this.reconnectTimeout = null;
+                }
+                
+                // Unsubscribe from all destinations
+                this.subscriptions.forEach(({ subscription }, destination) => {
+                    if (subscription) {
+                        try {
+                            subscription.unsubscribe();
+                            console.log(`[WebSocket] Unsubscribed from ${destination}`);
+                        } catch (e) {
+                            console.error(`[WebSocket] Error unsubscribing from ${destination}:`, e);
+                        }
+                    }
+                });
+                
+                // Clear subscriptions
+                this.subscriptions.clear();
+                
+                // Disconnect STOMP client
+                if (this.stompClient) {
+                    try {
+                        this.stompClient.disconnect();
+                        console.log('[WebSocket] Disconnected');
+                    } catch (e) {
+                        console.error('[WebSocket] Error during disconnect:', e);
+                    } finally {
+                        this.stompClient = null;
+                    }
+                }
+                
+                this.isConnected = false;
+                this.connectionPromise = null;
+            }
+
+            onConnect(callback) {
+                if (typeof callback === 'function') {
+                    this.connectCallbacks.push(callback);
+                }
+                return this;
+            }
+
+            onError(callback) {
+                if (typeof callback === 'function') {
+                    this.errorCallbacks.push(callback);
+                }
+                return this;
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize WebSocket client
+            const webSocketClient = new WebSocketClient();
+            
+            // Make it available globally for debugging
+            window.webSocketClient = webSocketClient;
+            
+            // Connect to WebSocket
+            webSocketClient.connect()
+                .then(() => {
+                    console.log('WebSocket client connected');
+                    updateConnectionStatus(true, 'Connected');
+                    
+                    // Subscribe to price updates
+                    webSocketClient.subscribe('/topic/prices', (message) => {
+                        console.log('[WebSocket] Received message on /topic/prices:', message);
+                        
+                        try {
+                            // Handle different message formats
+                            if (Array.isArray(message)) {
+                                // Handle array of updates
+                                message.forEach(update => {
+                                    if (update) {
+                                        updateCryptoCard(update);
+                                    }
+                                });
+                            } else if (typeof message === 'object' && message !== null) {
+                                // Handle single update object
+                                updateCryptoCard(message);
+                            } else if (typeof message === 'string') {
+                                try {
+                                    // Try to parse string as JSON
+                                    const parsed = JSON.parse(message);
+                                    if (Array.isArray(parsed)) {
+                                        parsed.forEach(update => updateCryptoCard(update));
+                                    } else {
+                                        updateCryptoCard(parsed);
+                                    }
+                                } catch (e) {
+                                    console.warn('Failed to parse message as JSON:', message);
+                                }
+                            } else {
+                                console.warn('Received message in unexpected format:', message);
+                            }
+                        } catch (error) {
+                            console.error('Error processing WebSocket message:', error);
+                            console.error('Message that caused the error:', message);
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Failed to connect to WebSocket:', error);
+                    updateConnectionStatus(false, 'Connection failed');
+                });
+            
+            // Load initial data
+            fetchCryptoData();
+        });
+
+        // Function to update connection status in the UI
+        function updateConnectionStatus(connected, message) {
+            const statusElement = document.getElementById('connectionStatus');
+            const textElement = document.getElementById('connectionText');
+            const navbar = document.querySelector('.navbar');
+            
+            // Remove all existing status classes
+            statusElement.classList.remove('connected', 'disconnected', 'connecting');
+            
+            if (connected) {
+                // Connected state
+                statusElement.classList.add('connected');
+                textElement.textContent = 'Connected';
+                textElement.className = 'text-light';
+                
+                // Flash the navbar green briefly to indicate successful connection
+                navbar.style.transition = 'background-color 0.5s ease';
+                navbar.style.backgroundColor = '#1e7e34';
+                setTimeout(() => {
+                    navbar.style.backgroundColor = '';
+                    setTimeout(() => navbar.style.transition = '', 500);
+                }, 1000);
+                
+            } else if (message && message.includes('Reconnecting')) {
+                // Reconnecting state
+                statusElement.classList.add('connecting');
+                textElement.textContent = message;
+                textElement.className = 'text-warning';
+                
+            } else {
+                // Disconnected state
+                statusElement.classList.add('disconnected');
+                textElement.textContent = message || 'Disconnected';
+                textElement.className = 'text-warning';
+                
+                // Flash the navbar red to indicate disconnection
+                navbar.style.transition = 'background-color 0.5s ease';
+                navbar.style.backgroundColor = '#bd2130';
+                setTimeout(() => {
+                    navbar.style.backgroundColor = '';
+                    setTimeout(() => navbar.style.transition = '', 500);
+                }, 1000);
+            }
+            
+            // Add a timestamp to the status
+            const timeElement = document.getElementById('connectionTime');
+            if (!timeElement) {
+                const timeSpan = document.createElement('span');
+                timeSpan.id = 'connectionTime';
+                timeSpan.className = 'ms-2 text-muted small';
+                textElement.parentNode.appendChild(timeSpan);
+            }
+            const now = new Date();
+            document.getElementById('connectionTime').textContent = `(${now.toLocaleTimeString()})`;
+        }
+
+        // Function to update a crypto card in the UI
+        function updateCryptoCard(update) {
+            try {
+                // Log the received update for debugging
+                console.log('[UI] Received update:', update);
+                
+                // Handle different message formats
+                let symbol, price, priceChange, timestamp, priceChangePercent;
+                
+                // Format 1: Direct update from our backend
+                if (update.symbol) {
+                    symbol = update.symbol.toUpperCase();
+                    price = update.newPrice || update.price || update.lastPrice || update.c || update[1]?.c?.[0];
+                    priceChange = update.priceChange || update.change24h || update[1]?.p?.[1];
+                    timestamp = update.timestamp || update.time || update[1]?.t?.[1] || new Date().getTime();
+                    priceChangePercent = update.priceChangePercent || update.change24hPercent || update[1]?.P?.[1];
+                }
+                // Format 2: Raw Kraken ticker update
+                else if (Array.isArray(update) && update.length >= 4) {
+                    symbol = update[3];
+                    const tickerData = update[1];
+                    if (tickerData && tickerData.c) {
+                        price = tickerData.c[0]; // Last trade price
+                        priceChange = tickerData.p[1]; // 24h price change
+                        priceChangePercent = tickerData.P[1]; // 24h price change percent
+                        timestamp = tickerData.t[1]; // Timestamp of last trade
+                    }
+                }
+                
+                // Validate required fields
+                if (!symbol) {
+                    console.error('Received update with no symbol:', update);
+                    return;
+                }
+                
+                if (price === undefined) {
+                    console.warn(`No price found in update for ${symbol}:`, update);
+                    return;
+                }
+                
+                // Find the card element
+                const card = document.getElementById(`crypto-${symbol}`);
+                if (!card) {
+                    console.log(`Card for ${symbol} not found, skipping update`);
+                    return;
+                }
+                
+                // Update price with animation
+                const priceElement = card.querySelector('.card-price');
+                if (priceElement) {
+                    const lastPrice = priceElement.dataset.lastPrice ? 
+                        parseFloat(priceElement.dataset.lastPrice) : null;
+                    const currentPrice = parseFloat(price);
+                    
+                    // Add visual feedback for price changes
+                    if (lastPrice !== null) {
+                        if (currentPrice > lastPrice) {
+                            // Price went up
+                            priceElement.classList.remove('text-danger', 'text-muted');
+                            priceElement.classList.add('text-success', 'price-up');
+                            
+                            // Flash the card green briefly
+                            card.classList.add('bg-success', 'bg-opacity-10');
+                            setTimeout(() => {
+                                card.classList.remove('bg-success', 'bg-opacity-10');
+                            }, 1000);
+                            
+                        } else if (currentPrice < lastPrice) {
+                            // Price went down
+                            priceElement.classList.remove('text-success', 'text-muted');
+                            priceElement.classList.add('text-danger', 'price-down');
+                            
+                            // Flash the card red briefly
+                            card.classList.add('bg-danger', 'bg-opacity-10');
+                            setTimeout(() => {
+                                card.classList.remove('bg-danger', 'bg-opacity-10');
+                            }, 1000);
+                            
+                        } else {
+                            // Price unchanged
+                            priceElement.classList.remove('text-success', 'text-danger');
+                            priceElement.classList.add('text-muted');
+                        }
+                        
+                        // Remove animation classes after they complete
+                        setTimeout(() => {
+                            priceElement.classList.remove('price-up', 'price-down');
+                        }, 1500);
+                    } else {
+                        // First time setting price
+                        priceElement.classList.add('text-muted');
+                    }
+                    
+                    // Update the price with a smooth transition
+                    priceElement.style.transition = 'color 0.3s ease, transform 0.3s ease';
+                    priceElement.style.display = 'inline-block';
+                    
+                    // Add a slight bounce effect
+                    priceElement.style.transform = 'scale(1.1)';
+                    setTimeout(() => {
+                        priceElement.style.transform = 'scale(1)';
+                    }, 150);
+                    
+                    // Update the price text
+                    priceElement.textContent = formatPrice(price);
+                    priceElement.dataset.lastPrice = price;
+                }
+                
+                // Update price change
+                const changeElement = card.querySelector('.price-change');
+                if (changeElement && (priceChange !== undefined || priceChangePercent !== undefined)) {
+                    const changeValue = priceChangePercent !== undefined ? 
+                        formatPercentChange(priceChangePercent) : 
+                        (priceChange !== undefined ? formatPrice(priceChange) : '');
+                    
+                    changeElement.textContent = changeValue;
+                    
+                    // Set color based on positive/negative change
+                    if (priceChangePercent !== undefined) {
+                        const isPositive = parseFloat(priceChangePercent) >= 0;
+                        changeElement.className = `price-change ${isPositive ? 'text-success' : 'text-danger'}`;
+                    } else if (priceChange !== undefined) {
+                        const isPositive = parseFloat(priceChange) >= 0;
+                        changeElement.className = `price-change ${isPositive ? 'text-success' : 'text-danger'}`;
+                    }
+                }
+                
+                // Update timestamp
+                const lastUpdatedElement = card.querySelector('.last-updated');
+                if (lastUpdatedElement && timestamp) {
+                    const date = new Date(parseInt(timestamp, 10));
+                    lastUpdatedElement.textContent = `Last updated: ${date.toLocaleTimeString()}`;
+                    lastUpdatedElement.title = date.toString();
+                }
+                
+                // Log the update
+                console.log(`[UI] Updated ${symbol} price to ${price}${priceChangePercent ? ` (${priceChangePercent}%)` : ''}`);
+                
+            } catch (error) {
+                console.error('Error updating crypto card:', error);
+                console.error('Update data that caused the error:', update);
+            }
+        }
+
+        // Function to fetch initial crypto data
+        async function fetchCryptoData() {
+            try {
+                console.log('Fetching initial crypto data...');
+                const response = await fetch('http://localhost:8091/api/crypto');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Fetched crypto data:', data);
+                
+                // Update UI with initial data
+                updateCryptoList(data);
+                updateLastUpdated();
+                
+            } catch (error) {
+                console.error('Error fetching crypto data:', error);
+                updateConnectionStatus(false, 'Failed to load data');
+                
+                const container = document.getElementById('cryptoContainer');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="col-12">
+                            <div class="alert alert-danger" role="alert">
+                                Failed to load cryptocurrency data. Please try again later.
+                                <button class="btn btn-sm btn-outline-secondary ms-2" onclick="fetchCryptoData()">
+                                    Retry
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // Function to update the crypto list in the UI
+        function updateCryptoList(cryptoList) {
+            const container = document.getElementById('cryptoContainer');
+            if (!container) return;
+            
+            if (!cryptoList || cryptoList.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12">
+                        <div class="alert alert-warning" role="alert">
+                            No cryptocurrency data available.
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Simple fallback for crypto icons
+            function getCryptoIcon(symbol) {
+                const icons = {
+                    'BTC': '₿', 'ETH': 'Ξ', 'XRP': '✕', 'LTC': 'Ł', 
+                    'BCH': 'Ƀ', 'BNB': '₿', 'EOS': 'ε', 'XLM': '*',
+                    'TRX': '₮', 'XTZ': 'ꜩ', 'ATOM': '⚛', 'LINK': '🔗',
+                    'DOT': '●', 'ADA': '₳', 'XMR': 'ɱ', 'DASH': 'Đ',
+                    'ZEC': 'ⓩ', 'DOGE': 'Ð', 'VET': 'ᐯ', 'FIL': '⨎',
+                    'SOL': '◎', 'UNI': '🦄', 'AAVE': '🦇', 'GRT': '🌐',
+                    'SNX': '₴', 'COMP': '🦄', 'MKR': '��', 'YFI': '🏦',
+                    'SUSHI': '🍣', 'CRV': '🔄', 'BAL': '⚖', 'REN': '🏛',
+                    'NEO': 'N', 'ETC': 'ξ', 'XEM': 'X', 'ZIL': 'Z',
+                    'QTUM': 'Q', 'ICX': '⚡', 'WAVES': 'W', 'ONT': 'O',
+                    'ZRX': 'Z', 'ALGO': 'Ⱥ', 'BAT': '🦇', 'OMG': 'OMG',
+                    'KSM': 'K', 'AVAX': 'A', 'FTM': 'F', 'MATIC': 'M',
+                    'NEAR': 'Ⓝ', 'ONE': '1', 'EGLD': 'eGLD', 'CELO': 'C'
+                };
+                return icons[symbol] || symbol;
+            }
+            
+            container.innerHTML = cryptoList.map(crypto => `
+                <div class="col-md-4 mb-4" id="crypto-${crypto.symbol}">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title mb-0">
+                                    <span class="crypto-icon me-2" style="display: inline-block; width: 24px; text-align: center;">
+                                        ${getCryptoIcon(crypto.symbol)}
+                                    </span>
+                                    ${crypto.name} (${crypto.symbol})
+                                </h5>
+                                <span class="badge bg-primary">#${crypto.id || 'N/A'}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fs-4 fw-bold card-price">${formatPrice(crypto.currentPrice)}</div>
+                                    <div class="text-muted">Price (USD)</div>
+                                </div>
+                                <div class="text-end">
+                                    <div class="fs-5 fw-bold card-change text-muted">
+                                        <!-- 24h change not available in the API -->
+                                        --%
+                                    </div>
+                                    <div class="text-muted">24h</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    Last updated: ${new Date(crypto.lastUpdated).toLocaleTimeString()}
+                                </small>
+                                <button class="btn btn-sm btn-outline-primary" 
+                                        onclick="showTradeModal('${crypto.symbol}', '${crypto.name}')">
+                                    Trade
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Function to update the last updated timestamp
+        function updateLastUpdated() {
+            const now = new Date();
+            const timeElement = document.getElementById('lastUpdated');
+            if (timeElement) {
+                timeElement.textContent = `Last updated: ${now.toLocaleTimeString()}`;
+            }
+        }
+
+        // Function to show trade modal
+        function showTradeModal(symbol, name) {
+            const modal = new bootstrap.Modal(document.getElementById('tradeModal'));
+            const modalTitle = document.getElementById('tradeModalLabel');
+            const cryptoName = document.getElementById('cryptoName');
+            
+            if (modalTitle) modalTitle.textContent = `Trade ${name} (${symbol.toUpperCase()})`;
+            if (cryptoName) cryptoName.textContent = name;
+            
+            modal.show();
+        }
+    </script>
+</body>
+</html>

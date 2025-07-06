@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@6.1.2/bundles/stomp.umd.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #output { margin-top: 20px; padding: 10px; border: 1px solid #ccc; min-height: 200px; }
+        .connected { color: green; }
+        .disconnected { color: red; }
+    </style>
+</head>
+<body>
+    <h1>WebSocket Test</h1>
+    <div>
+        <button id="connect">Connect</button>
+        <span id="status">Status: <span class="disconnected">Disconnected</span></span>
+    </div>
+    <div id="output"></div>
+
+    <script>
+        const output = document.getElementById('output');
+        const status = document.querySelector('#status span');
+        let stompClient = null;
+
+        function log(message) {
+            const p = document.createElement('p');
+            p.textContent = message;
+            output.appendChild(p);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function connect() {
+            log('Connecting to WebSocket...');
+            const socket = new SockJS('/ws');
+            stompClient = Stomp.over(socket);
+            
+            stompClient.connect({}, function(frame) {
+                log('Connected: ' + frame);
+                status.textContent = 'Connected';
+                status.className = 'connected';
+                
+                // Subscribe to the price updates
+                stompClient.subscribe('/topic/prices', function(message) {
+                    const update = JSON.parse(message.body);
+                    log(`Price update: ${update.symbol} = $${update.newPrice} (${new Date(update.timestamp).toLocaleTimeString()})`);
+                });
+                
+            }, function(error) {
+                log('Error: ' + error);
+                status.textContent = 'Connection failed';
+                status.className = 'disconnected';
+            });
+        }
+
+        document.getElementById('connect').addEventListener('click', function() {
+            if (stompClient && stompClient.connected) {
+                log('Already connected');
+                return;
+            }
+            connect();
+        });
+    </script>
+</body>
+</html>

@@ -1,21 +1,109 @@
 package com.trading212.Trading212.repository;
 
+import com.trading212.Trading212.model.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+
+import java.math.BigDecimal;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class UserRepo {
 
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
     public UserRepo(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public void insert(String name) {
-        jdbcTemplate.update("INSERT INTO users (username,balance) values  (?,?)", name, 10000);
+    // RowMapper for UserEntity
+    private static final class UserRowMapper implements RowMapper<UserEntity> {
+        @Override
+        public UserEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
+            UserEntity user = new UserEntity();
+            user.setId(rs.getLong("id"));
+            user.setUsername(rs.getString("username"));
+            user.setBalance(rs.getBigDecimal("balance"));
+            user.setLastUpdated(rs.getTimestamp("last_updated").toLocalDateTime());
+            return user;
+        }
     }
 
+    public Long insert(String username) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(
+                "INSERT INTO users (username, balance) VALUES (?, ?)", 
+                Statement.RETURN_GENERATED_KEYS
+            );
+            ps.setString(1, username);
+            ps.setBigDecimal(2, new BigDecimal("10000.00"));
+            return ps;
+        }, keyHolder);
+
+        return keyHolder.getKey().longValue();
+    }
+
+    public Optional<UserEntity> findById(Long id) {
+        try {
+            UserEntity user = jdbcTemplate.queryForObject(
+                "SELECT id, username, balance, last_updated FROM users WHERE id = ?",
+                new UserRowMapper(),
+                id
+            );
+            return Optional.ofNullable(user);
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<UserEntity> findByUsername(String username) {
+        try {
+            List<UserEntity> users = jdbcTemplate.query(
+                "SELECT id, username, balance, last_updated FROM users WHERE username = ?", 
+                new UserRowMapper(), 
+                username
+            );
+            return users.stream().findFirst();
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    public List<UserEntity> findAll() {
+        return jdbcTemplate.query(
+            "SELECT id, username, balance, last_updated FROM users", 
+            new UserRowMapper()
+        );
+    }
+
+    public void updateBalance(Long userId, BigDecimal newBalance) {
+        jdbcTemplate.update(
+            "UPDATE users SET balance = ?, last_updated = CURRENT_TIMESTAMP WHERE id = ?",
+            newBalance, userId
+        );
+    }
+
+    public void resetBalance(Long userId) {
+        jdbcTemplate.update(
+            "UPDATE users SET balance = 10000.00, last_updated = CURRENT_TIMESTAMP WHERE id = ?",
+            userId
+        );
+    }
+
+    public boolean deleteUser(Long userId) {
+        int rowsAffected = jdbcTemplate.update("DELETE FROM users WHERE id = ?", userId);
+        return rowsAffected > 0;
+    }
 }
