@@ -5049,3 +5049,143 @@ Caused by: java.sql.SQLException: Referencing column 'user_id' and referenced co
 2025-07-06 22:43:05 [SpringApplicationShutdownHook] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopped.
 2025-07-06 22:43:05 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
 2025-07-06 22:43:05 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-07-06 22:46:56 [main] INFO  c.t.Trading212.Trading212Application - Starting Trading212Application using Java 21.0.6 with PID 18944 (C:\Users\rados\Desktop\Trading212\Trading212\target\classes started by rados in C:\Users\rados\Desktop\Trading212\Trading212)
+2025-07-06 22:46:56 [main] DEBUG c.t.Trading212.Trading212Application - Running with Spring Boot v3.5.3, Spring v6.2.8
+2025-07-06 22:46:56 [main] INFO  c.t.Trading212.Trading212Application - No active profile set, falling back to 1 default profile: "default"
+2025-07-06 22:46:57 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JDBC repositories in DEFAULT mode.
+2025-07-06 22:46:57 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 8 ms. Found 0 JDBC repository interfaces.
+2025-07-06 22:46:57 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2025-07-06 22:46:57 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-07-06 22:46:57 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.42]
+2025-07-06 22:46:57 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-07-06 22:46:57 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 581 ms
+2025-07-06 22:46:57 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-07-06 22:46:57 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@2c0c4c0a
+2025-07-06 22:46:57 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-07-06 22:46:57 [main] INFO  c.t.Trading212.service.CryptoService - Starting cryptocurrency data initialization...
+2025-07-06 22:46:57 [main] INFO  c.t.T.repository.CryptoRepository - Checking if table cryptocurrencies exists...
+2025-07-06 22:46:57 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-06 22:46:57 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?]
+2025-07-06 22:46:57 [main] INFO  c.t.T.repository.CryptoRepository - Table cryptocurrencies exists in information_schema
+2025-07-06 22:46:57 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing SQL query [SELECT 1 FROM cryptocurrencies LIMIT 1]
+2025-07-06 22:46:57 [main] INFO  c.t.T.repository.CryptoRepository - Successfully queried table cryptocurrencies
+2025-07-06 22:46:57 [main] INFO  c.t.T.repository.CryptoRepository - Attempting to fetch all cryptocurrencies from database...
+2025-07-06 22:46:57 [main] INFO  c.t.T.repository.CryptoRepository - Checking if table cryptocurrencies exists...
+2025-07-06 22:46:57 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-06 22:46:57 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?]
+2025-07-06 22:46:57 [main] INFO  c.t.T.repository.CryptoRepository - Table cryptocurrencies exists in information_schema
+2025-07-06 22:46:57 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing SQL query [SELECT 1 FROM cryptocurrencies LIMIT 1]
+2025-07-06 22:46:57 [main] INFO  c.t.T.repository.CryptoRepository - Successfully queried table cryptocurrencies
+2025-07-06 22:46:57 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing SQL query [SELECT COUNT(*) FROM cryptocurrencies]
+2025-07-06 22:46:57 [main] INFO  c.t.T.repository.CryptoRepository - Found 20 cryptocurrency records in the database
+2025-07-06 22:46:57 [main] DEBUG c.t.T.repository.CryptoRepository - Executing query: SELECT id, symbol, name, kraken_pair_name, current_price, last_updated FROM cryptocurrencies
+2025-07-06 22:46:57 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing SQL query [SELECT id, symbol, name, kraken_pair_name, current_price, last_updated FROM cryptocurrencies]
+2025-07-06 22:46:57 [main] INFO  c.t.T.repository.CryptoRepository - Successfully retrieved 20 cryptocurrency records
+2025-07-06 22:46:57 [main] INFO  c.t.T.repository.CryptoRepository - Sample records (first 3): [BTC (Bitcoin) = $108390.30, ETH (Ethereum) = $2534.42, ADA (Cardano) = $0.58]
+2025-07-06 22:46:57 [main] INFO  c.t.Trading212.service.CryptoService - Initialized 20 cryptocurrencies
+2025-07-06 22:46:57 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-06 22:46:57 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT id, username, balance, last_updated FROM users WHERE username = ?]
+2025-07-06 22:46:57 [main] INFO  c.t.Trading212.service.UserService - Default user already exists.
+2025-07-06 22:46:57 [main] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2025-07-06 22:46:57 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Starting...
+2025-07-06 22:46:57 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@3f1158ee]]
+2025-07-06 22:46:57 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Started.
+2025-07-06 22:46:57 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2025-07-06 22:46:57 [main] INFO  c.t.Trading212.Trading212Application - Started Trading212Application in 1.55 seconds (process running for 1.878)
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:46:58 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:46:59 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:46:59 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:47:00 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:47:00 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:47:00 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:47:00 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:47:02 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-07-06 22:47:02 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-07-06 22:47:02 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2025-07-06 22:47:02 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:47:02 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:47:02 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:47:02 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:47:02 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:47:02 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:47:03 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:47:03 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:47:03 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:47:03 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:47:03 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:47:03 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:47:03 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:47:03 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:47:05 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:47:05 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:47:05 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:47:05 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:47:06 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:47:06 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:47:06 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:47:06 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:47:07 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:47:07 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:47:07 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:47:07 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:47:07 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:47:07 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:47:07 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:47:07 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:47:07 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:47:07 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:47:07 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:47:07 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:47:08 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:47:08 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:47:08 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:47:08 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:47:10 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:47:10 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:47:10 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:47:10 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:47:14 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:47:14 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:47:18 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:47:18 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:47:20 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:47:20 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:47:31 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:47:31 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
+2025-07-06 22:47:31 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL update
+2025-07-06 22:47:31 [OkHttp https://ws.kraken.com/...] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?]
