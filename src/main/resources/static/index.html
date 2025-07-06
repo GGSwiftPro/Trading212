@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crypto Trading Platform</title>
+    <!-- WebSocket Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -16,41 +19,165 @@
             transform: translateY(-5px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-        .connection-status {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-right: 8px;
-            vertical-align: middle;
+        /* WebSocket Control Panel */
+        .websocket-control-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background-color: #f8f9fa;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid #dee2e6;
+            z-index: 1000;
+            max-width: 90%;
             transition: all 0.3s ease;
         }
-        .connected {
+        
+        .connection-info {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .connection-status {
+            display: flex;
+            align-items: center;
+            margin-right: 10px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-group-sm > .btn {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn i {
+            margin-right: 4px;
+            font-size: 0.9em;
+        }
+        
+        .btn-outline-primary {
+            border-color: #0d6efd;
+            color: #0d6efd;
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: #0d6efd;
+            color: white;
+        }
+        
+        .btn-outline-secondary {
+            border-color: #6c757d;
+            color: #6c757d;
+        }
+        
+        .btn-outline-secondary:hover {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-outline-warning {
+            border-color: #ffc107;
+            color: #ffc107;
+        }
+        
+        .btn-outline-warning:hover {
+            background-color: #ffc107;
+            color: #000;
+        }
+        
+        .btn-outline-info {
+            border-color: #0dcaf0;
+            color: #0dcaf0;
+        }
+        
+        .btn-outline-info:hover {
+            background-color: #0dcaf0;
+            color: #000;
+        }
+        
+        .connection-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #6c757d;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+        
+        .connection-status.connected .connection-dot {
             background-color: #28a745;
             box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
         }
-        .disconnected {
-            background-color: #dc3545;
-            animation: pulse 2s infinite;
+        
+        .connection-status.connected {
+            border-color: #28a745;
+            background-color: rgba(40, 167, 69, 0.1);
         }
-        .connecting {
+        
+        .connection-status.connecting .connection-dot {
             background-color: #ffc107;
             animation: pulse 1.5s infinite;
         }
         
-        /* Price change animations */
-        @keyframes highlightGreen {
-            0% { background-color: rgba(40, 167, 69, 0.1); }
-            100% { background-color: transparent; }
+        .connection-status.connecting {
+            border-color: #ffc107;
+            background-color: rgba(255, 193, 7, 0.1);
         }
-        @keyframes highlightRed {
-            0% { background-color: rgba(220, 53, 69, 0.1); }
-            100% { background-color: transparent; }
+        
+        .connection-status.disconnected .connection-dot {
+            background-color: #dc3545;
         }
+        
+        .connection-status.disconnected {
+            border-color: #dc3545;
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+        
         @keyframes pulse {
             0% { opacity: 0.6; }
             50% { opacity: 1; }
             100% { opacity: 0.6; }
+        }
+        
+        .connection-status.connecting .connection-dot {
+            background-color: #ffc107;
+            animation: pulse 2s infinite;
+        }
+        
+        .connection-status.disconnected .connection-dot {
+            background-color: #dc3545;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .connection-status.connected {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        
+        .connection-status.connecting {
+            background-color: #fff3cd;
+            border-color: #ffeeba;
+            color: #856404;
+        }
+        
+        .connection-status.disconnected {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
         }
         
         .price-up {
@@ -72,18 +199,58 @@
             transform: translateY(-3px);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
+        
+        /* Price change animations */
+        @keyframes highlightGreen {
+            0% { background-color: rgba(40, 167, 69, 0.1); }
+            100% { background-color: transparent; }
+        }
+        @keyframes highlightRed {
+            0% { background-color: rgba(220, 53, 69, 0.1); }
+            100% { background-color: transparent; }
+        }
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="#">Crypto Trading Platform</a>
-            <div class="d-flex align-items-center">
-                <span id="connectionStatus" class="connection-status disconnected me-2"></span>
-                <span id="connectionText" class="text-light">Disconnected</span>
-            </div>
         </div>
     </nav>
+    
+    <!-- WebSocket Control Panel (positioned fixed at bottom right) -->
+    <div class="websocket-control-panel">
+        <div class="connection-info">
+            <div id="connectionStatus" class="connection-status">
+                <span class="connection-dot"></span>
+                <span id="connectionText" class="ms-2">Disconnected</span>
+                <span id="connectionTime" class="text-muted small ms-2"></span>
+            </div>
+            
+            <div class="btn-group btn-group-sm ms-2">
+                <button id="connectButton" class="btn btn-outline-primary" title="Connect/Reconnect">
+                    <i class="bi bi-plug"></i> <span class="d-none d-sm-inline">Connect</span>
+                </button>
+                <button id="connectionInfo" class="btn btn-outline-info" title="Connection Info">
+                    <i class="bi bi-info-circle"></i>
+                </button>
+            </div>
+            
+            <div class="btn-group btn-group-sm ms-2">
+                <button id="sendTestMessage" class="btn btn-outline-secondary" title="Send Test Message">
+                    <i class="bi bi-send"></i> <span class="d-none d-sm-inline">Test</span>
+                </button>
+                <button id="sendBroadcast" class="btn btn-outline-warning" title="Send Broadcast">
+                    <i class="bi bi-broadcast"></i> <span class="d-none d-sm-inline">Broadcast</span>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <div class="container my-4">
         <div class="row mb-4">
@@ -156,296 +323,365 @@
             return parseFloat(change) >= 0 ? `+${formatted}%` : `${formatted}%`;
         }
 
-        // WebSocket Client with enhanced error handling and logging
+        // WebSocket Client using SockJS and STOMP
         class WebSocketClient {
             constructor() {
                 this.stompClient = null;
                 this.isConnected = false;
+                this.isConnecting = false;
+                this.manuallyClosed = false;
                 this.reconnectAttempts = 0;
-                this.maxReconnectAttempts = 10; // Increased max attempts
-                this.reconnectDelay = 3000;
+                this.maxReconnectAttempts = 5;
+                this.reconnectDelay = 5000;
                 this.subscriptions = new Map();
+                this.pendingSubscriptions = [];
+                this.messageHandlers = [];
                 this.connectCallbacks = [];
+                this.disconnectCallbacks = [];
                 this.errorCallbacks = [];
                 this.connectionPromise = null;
-                this.reconnectTimeout = null;
             }
-
+            
             connect() {
-                // Return existing connection promise if already connecting/connected
+                // Return existing connection promise if already connecting
                 if (this.connectionPromise) {
                     return this.connectionPromise;
                 }
-
-                console.log('[WebSocket] Attempting to connect...');
                 
-                this.connectionPromise = new Promise((resolve, reject) => {
+                return this.connectionPromise = new Promise((resolve, reject) => {
+                    console.log('[WebSocket] Attempting to connect...');
+                    this.isConnecting = true;
+                    
+                    // Reset manually closed flag
+                    this.manuallyClosed = false;
+                    
+                    // Close any existing connection
+                    if (this.stompClient) {
+                        try {
+                            if (this.stompClient.connected) {
+                                this.stompClient.disconnect();
+                            }
+                        } catch (e) {
+                            console.warn('Error disconnecting existing client:', e);
+                        }
+                    }
+                    
                     try {
-                        const socket = new SockJS('http://localhost:8091/ws');
+                        // Create a new SockJS client
+                        console.log('[WebSocket] Creating new SockJS connection to /ws');
+                        const socket = new SockJS('/ws');
+                        
+                        // Create STOMP client over SockJS
                         this.stompClient = Stomp.over(socket);
                         
-                        // Configure debug logging (can be enabled for troubleshooting)
-                        this.stompClient.debug = (message) => {
-                            // Uncomment to see STOMP frames
-                            // console.log('[STOMP]', message);
-                        };
+                        // Disable debug logging in production
+                        this.stompClient.debug = () => {};
                         
-                        // Set heartbeat (important for keeping connection alive)
-                        this.stompClient.heartbeat.outgoing = 10000; // 10 seconds
-                        this.stompClient.heartbeat.incoming = 10000; // 10 seconds
-                        
-                        // Connection headers
+                        // Set up connection headers
                         const headers = {
+                            'heart-beat': '10000,10000',
                             'accept-version': '1.2',
-                            'heart-beat': '10000,10000'
+                            'host': window.location.host
                         };
                         
-                        // Connect to STOMP
+                        // Connect to the STOMP broker
+                        console.log('[WebSocket] Attempting STOMP handshake...');
                         this.stompClient.connect(
                             headers,
-                            (frame) => this.onConnect(frame, resolve),
-                            (error) => this.onError(error, reject)
+                            (frame) => {
+                                console.log('[WebSocket] STOMP connection established:', frame);
+                                this.isConnected = true;
+                                this.isConnecting = false;
+                                this.reconnectAttempts = 0;
+                                this.onopen();
+                                this.connectionPromise = null; // Clear the promise on success
+                                resolve(frame);
+                            },
+                            (error) => {
+                                console.error('[WebSocket] STOMP connection error:', error);
+                                this.isConnected = false;
+                                this.isConnecting = false;
+                                this.connectionPromise = null; // Clear the promise on error
+                                this.onerror(error);
+                                reject(error);
+                            }
                         );
                         
-                        // Handle WebSocket close events
-                        socket.onclose = (event) => {
-                            console.warn('[WebSocket] Connection closed:', event);
-                            this.handleDisconnect();
-                            this.scheduleReconnect();
-                        };
-                        
-                        // Handle WebSocket errors
-                        socket.onerror = (error) => {
-                            console.error('[WebSocket] Error:', error);
-                            this.handleDisconnect();
-                        };
-                        
                     } catch (error) {
-                        console.error('[WebSocket] Connection setup error:', error);
-                        this.handleDisconnect();
+                        console.error('[WebSocket] Connection error:', error);
+                        this.onerror(error);
                         reject(error);
                     }
                 });
-                
-                return this.connectionPromise;
             }
             
-            onConnect(frame, resolve) {
-                console.log('[WebSocket] Connected to STOMP endpoint');
-                console.log('[WebSocket] Protocol Version:', frame.headers.version);
-                console.log('[WebSocket] Server:', frame.headers.server);
-                
+            onopen() {
+                console.log('[WebSocket] Connection established');
                 this.isConnected = true;
                 this.reconnectAttempts = 0;
                 
-                // Resubscribe to any existing subscriptions
-                this.subscriptions.forEach(({ callback, subscription }, destination) => {
-                    if (subscription) {
-                        try {
-                            subscription.unsubscribe();
-                        } catch (e) {
-                            console.warn(`[WebSocket] Error unsubscribing from ${destination}:`, e);
-                        }
+                // Notify all connect callbacks
+                this.messageHandlers.forEach(callback => {
+                    try {
+                        callback();
+                    } catch (e) {
+                        console.error('Error in connect callback:', e);
                     }
+                });
+            }
+            
+            onerror(error) {
+                console.error('[WebSocket] Error:', error);
+                this.isConnected = false;
+                
+                // Only attempt to reconnect if not manually closed
+                if (!this.manuallyClosed && this.reconnectAttempts < this.maxReconnectAttempts) {
+                    const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts);
+                    console.log(`[WebSocket] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts + 1}/${this.maxReconnectAttempts})`);
+                    
+                    this.reconnectAttempts++;
+                    setTimeout(() => this.connect().catch(console.error), delay);
+                }
+            }
+            
+            onclose(event) {
+                console.log('[WebSocket] Connection closed', event);
+                this.isConnected = false;
+                
+                // Try to reconnect if this wasn't a manual close
+                if (!this.manuallyClosed) {
+                    this.onerror(new Error('Connection closed'));
+                }
+            }
+            
+            // Notify all error callbacks
+            notifyErrorCallbacks(error) {
+                if (this.errorCallbacks && this.errorCallbacks.length > 0) {
+                    this.errorCallbacks.forEach(callback => {
+                        try {
+                            callback(error);
+                        } catch (e) {
+                            console.error('Error in error callback:', e);
+                        }
+                    });
+                }
+            }
+            
+            onConnect(frame, resolve) {
+                console.log('[WebSocket] Connected to STOMP endpoint:', frame);
+                this.isConnected = true;
+                this.isConnecting = false;
+                this.reconnectAttempts = 0;
+                
+                // Notify all connect callbacks
+                this.connectCallbacks.forEach(callback => {
+                    try {
+                        callback();
+                    } catch (e) {
+                        console.error('Error in connect callback:', e);
+                    }
+                });
+                
+                // Process any pending subscriptions
+                const pending = [...this.pendingSubscriptions];
+                this.pendingSubscriptions = [];
+                
+                pending.forEach(({ destination, callback }) => {
                     this.subscribe(destination, callback);
                 });
                 
-                // Call all connect callbacks
-                this.connectCallbacks.forEach(cb => {
-                    try {
-                        cb();
-                    } catch (e) {
-                        console.error('[WebSocket] Error in connect callback:', e);
-                    }
+                // Resubscribe to any existing subscriptions
+                this.subscriptions.forEach(({ destination, callback }) => {
+                    console.log(`[WebSocket] Resubscribing to ${destination}`);
+                    this.subscribe(destination, callback);
                 });
                 
                 resolve();
             }
             
             onError(error, reject) {
-                console.error('[WebSocket] Connection error:', error);
-                this.handleDisconnect();
-                this.scheduleReconnect(reject);
-            }
-            
-            handleDisconnect() {
+                console.error('[WebSocket] STOMP connection error:', error);
                 this.isConnected = false;
-                if (this.stompClient) {
-                    try {
-                        this.stompClient.disconnect();
-                    } catch (e) {
-                        console.error('[WebSocket] Error during disconnect:', e);
-                    }
-                    this.stompClient = null;
+                
+                // Notify error callbacks
+                this.notifyErrorCallbacks(error);
+                
+                // Reject the connect promise
+                if (reject) {
+                    reject(error);
                 }
-                this.connectionPromise = null;
+                
+                // Try to reconnect if we're not already reconnecting and this wasn't a manual close
+                if (!this.reconnectTimeout && !this.manuallyClosed) {
+                    this.scheduleReconnect();
+                }
             }
             
-            scheduleReconnect(reject) {
-                if (this.reconnectTimeout) {
-                    clearTimeout(this.reconnectTimeout);
+            scheduleReconnect() {
+                if (this.manuallyClosed || this.reconnectAttempts >= this.maxReconnectAttempts) {
+                    console.error('[WebSocket] Max reconnection attempts reached or connection manually closed');
+                    return;
                 }
                 
-                if (this.reconnectAttempts < this.maxReconnectAttempts) {
-                    this.reconnectAttempts++;
-                    const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000); // Exponential backoff with max 30s
-                    
-                    console.log(`[WebSocket] Reconnecting in ${delay/1000}s (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
-                    
-                    // Notify error callbacks
-                    this.errorCallbacks.forEach(cb => {
-                        try {
-                            cb(new Error(`Connection lost. Reconnecting in ${delay/1000}s (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`));
-                        } catch (e) {
-                            console.error('[WebSocket] Error in error callback:', e);
+                this.reconnectAttempts++;
+                // Exponential backoff with jitter
+                const baseDelay = Math.min(this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1), 30000);
+                const jitter = Math.random() * 1000; // Add up to 1s jitter
+                const delay = Math.min(baseDelay + jitter, 30000); // Cap at 30s
+                
+                console.log(`[WebSocket] Reconnecting in ${Math.round(delay)}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+                
+                this.reconnectTimeout = setTimeout(() => {
+                    this.reconnectTimeout = null;
+                    this.connect().catch(error => {
+                        console.error('[WebSocket] Reconnection failed:', error);
+                        if (!this.manuallyClosed) {
+                            this.scheduleReconnect();
                         }
                     });
-                    
-                    this.reconnectTimeout = setTimeout(() => {
-                        this.connect().catch(error => {
-                            console.error('[WebSocket] Reconnection failed:', error);
-                            if (reject) reject(error);
-                        });
-                    }, delay);
-                } else {
-                    const errorMsg = 'Max reconnection attempts reached';
-                    console.error(`[WebSocket] ${errorMsg}`);
-                    this.errorCallbacks.forEach(cb => {
-                        try {
-                            cb(new Error(errorMsg));
-                        } catch (e) {
-                            console.error('[WebSocket] Error in error callback:', e);
-                        }
-                    });
-                    if (reject) reject(new Error(errorMsg));
-                }
+                }, delay);
             }
-
+            
             subscribe(destination, callback) {
-                console.log(`[WebSocket] Subscribing to ${destination}`);
-                
-                // Store the subscription for reconnection
-                if (!this.subscriptions.has(destination)) {
-                    this.subscriptions.set(destination, { callback });
-                } else {
-                    this.subscriptions.get(destination).callback = callback;
-                }
-                
-                // If not connected, the subscription will be established on connect
                 if (!this.isConnected || !this.stompClient) {
-                    console.warn(`[WebSocket] Not connected. Subscription to ${destination} will be established once connected.`);
-                    return null;
+                    console.warn(`[WebSocket] Not connected. Queueing subscription to ${destination}`);
+                    // Queue the subscription for when we reconnect
+                    this.subscriptions.set(destination, { destination, callback });
+                    this.pendingSubscriptions.push({ destination, callback });
+                    return;
                 }
                 
                 try {
-                    // Unsubscribe first if already subscribed
-                    if (this.subscriptions.get(destination).subscription) {
-                        try {
-                            this.subscriptions.get(destination).subscription.unsubscribe();
-                        } catch (e) {
-                            console.warn(`[WebSocket] Error unsubscribing from ${destination}:`, e);
-                        }
-                    }
-                    
-                    // Create new subscription
+                    console.log(`[WebSocket] Subscribing to ${destination}`);
                     const subscription = this.stompClient.subscribe(destination, (message) => {
                         try {
-                            console.log(`[WebSocket] Received message on ${destination}:`, message);
-                            
-                            let data;
+                            let parsedBody;
                             try {
-                                data = JSON.parse(message.body);
+                                parsedBody = typeof message.body === 'string' ? 
+                                    JSON.parse(message.body) : message.body;
                             } catch (e) {
-                                console.error(`[WebSocket] Error parsing message from ${destination}:`, e);
-                                console.error('[WebSocket] Raw message:', message.body);
-                                return;
+                                console.warn(`[WebSocket] Could not parse message as JSON, using raw body`);
+                                parsedBody = message.body;
                             }
-                            
-                            // Process the message
-                            try {
-                                callback(data);
-                            } catch (e) {
-                                console.error(`[WebSocket] Error in subscription callback for ${destination}:`, e);
-                                console.error('[WebSocket] Message data:', data);
-                            }
+                            callback(parsedBody);
                         } catch (e) {
-                            console.error(`[WebSocket] Unexpected error processing message from ${destination}:`, e);
+                            console.error(`[WebSocket] Error processing message from ${destination}:`, e);
+                            console.error('[WebSocket] Message that caused the error:', message);
                         }
                     });
                     
-                    // Store the subscription
-                    this.subscriptions.get(destination).subscription = subscription;
-                    console.log(`[WebSocket] Successfully subscribed to ${destination}`);
-                    
+                    // Store the subscription for later cleanup
+                    this.subscriptions.set(destination, { subscription, callback });
                     return subscription;
+                    
                 } catch (error) {
                     console.error(`[WebSocket] Error subscribing to ${destination}:`, error);
-                    return null;
-                }
-            }
-
-            send(destination, headers = {}, body = {}) {
-                if (!this.isConnected || !this.stompClient) {
-                    throw new Error('Not connected to WebSocket server');
-                }
-                
-                try {
-                    const payload = JSON.stringify(body);
-                    console.log(`[WebSocket] Sending to ${destination}:`, payload);
-                    this.stompClient.send(destination, headers, payload);
-                } catch (error) {
-                    console.error(`[WebSocket] Error sending message to ${destination}:`, error);
                     throw error;
                 }
             }
-
-            disconnect() {
-                console.log('[WebSocket] Disconnecting...');
+            
+            unsubscribe(destination) {
+                const subscription = this.subscriptions.get(destination);
+                if (subscription && subscription.subscription) {
+                    try {
+                        subscription.subscription.unsubscribe();
+                        this.subscriptions.delete(destination);
+                        console.log(`[WebSocket] Unsubscribed from ${destination}`);
+                    } catch (error) {
+                        console.error(`[WebSocket] Error unsubscribing from ${destination}:`, error);
+                    }
+                }
+            }
+            
+            send(destination, headers = {}, body = {}) {
+                if (!this.isConnected || !this.stompClient) {
+                    console.warn(`[WebSocket] Not connected. Cannot send message to ${destination}`);
+                    return Promise.reject(new Error('WebSocket not connected'));
+                }
                 
-                // Clear any pending reconnection
+                return new Promise((resolve, reject) => {
+                    try {
+                        const message = {
+                            destination,
+                            headers,
+                            body: JSON.stringify(body)
+                        };
+                        
+                        this.stompClient.send(destination, headers, JSON.stringify(body));
+                        resolve();
+                    } catch (error) {
+                        console.error(`[WebSocket] Error sending message to ${destination}:`, error);
+                        reject(error);
+                    }
+                });
+            }
+            
+            disconnect() {
+                this.manuallyClosed = true;
+                
                 if (this.reconnectTimeout) {
                     clearTimeout(this.reconnectTimeout);
                     this.reconnectTimeout = null;
                 }
                 
-                // Unsubscribe from all destinations
-                this.subscriptions.forEach(({ subscription }, destination) => {
-                    if (subscription) {
-                        try {
-                            subscription.unsubscribe();
-                            console.log(`[WebSocket] Unsubscribed from ${destination}`);
-                        } catch (e) {
-                            console.error(`[WebSocket] Error unsubscribing from ${destination}:`, e);
-                        }
-                    }
-                });
-                
-                // Clear subscriptions
-                this.subscriptions.clear();
-                
-                // Disconnect STOMP client
                 if (this.stompClient) {
                     try {
                         this.stompClient.disconnect();
-                        console.log('[WebSocket] Disconnected');
-                    } catch (e) {
-                        console.error('[WebSocket] Error during disconnect:', e);
-                    } finally {
-                        this.stompClient = null;
+                    } catch (error) {
+                        console.error('[WebSocket] Error during disconnect:', error);
                     }
+                    this.stompClient = null;
                 }
                 
                 this.isConnected = false;
-                this.connectionPromise = null;
+                console.log('[WebSocket] Disconnected');
             }
-
+            
+            // Clean up resources when the instance is no longer needed
+            destroy() {
+                this.disconnect();
+                this.subscriptions.clear();
+                this.messageHandlers = [];
+                this.connectCallbacks = [];
+                this.errorCallbacks = [];
+                this.pendingSubscriptions = [];
+            }
+            
+            /**
+             * Register a callback for connection events
+             * @param {Function} callback - Function to call when connected
+             */
             onConnect(callback) {
                 if (typeof callback === 'function') {
                     this.connectCallbacks.push(callback);
+                    
+                    // If already connected, call the callback immediately
+                    if (this.isConnected) {
+                        try {
+                            callback();
+                        } catch (e) {
+                            console.error('Error in onConnect callback:', e);
+                        }
+                    }
                 }
                 return this;
             }
-
+            
+            /**
+             * Register a callback for disconnection events
+             * @param {Function} callback - Function to call when disconnected
+             */
+            onDisconnect(callback) {
+                if (typeof callback === 'function') {
+                    this.disconnectCallbacks.push(callback);
+                }
+                return this;
+            }
+            
+            /**
+             * Register a callback for error events
+             * @param {Function} callback - Function to call on error
+             */
             onError(callback) {
                 if (typeof callback === 'function') {
                     this.errorCallbacks.push(callback);
@@ -454,402 +690,1313 @@
             }
         }
 
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', () => {
-            // Initialize WebSocket client
-            const webSocketClient = new WebSocketClient();
+        // WebSocket Manager to handle connection and subscriptions
+        class WebSocketManager {
+            constructor() {
+                this.client = new WebSocketClient();
+                this.isConnected = false;
+                this.isConnecting = false;
+                this.subscriptions = new Map();
+                this.messageHandlers = new Map(); // Initialize messageHandlers Map
+                this.connectionCallbacks = [];
+                this.disconnectionCallbacks = [];
+                this.errorCallbacks = [];
+                this.manuallyClosed = false;
+                
+                // Set up event handlers
+                this.client.onConnect(() => {
+                    this.isConnected = true;
+                    this.isConnecting = false;
+                    this.connectionCallbacks.forEach(callback => callback());
+                });
+                
+                this.client.onDisconnect(() => {
+                    this.isConnected = false;
+                    this.disconnectionCallbacks.forEach(callback => callback());
+                });
+                
+                this.client.onError(error => {
+                    this.errorCallbacks.forEach(callback => callback(error));
+                });
+                
+                // Auto-connect the client
+                this.connect().catch(error => {
+                    console.error('Failed to connect to WebSocket server:', error);
+                });
+                
+                // Expose for debugging
+                window.webSocketManager = this;
+            }
             
-            // Make it available globally for debugging
-            window.webSocketClient = webSocketClient;
-            
-            // Connect to WebSocket
-            webSocketClient.connect()
-                .then(() => {
-                    console.log('WebSocket client connected');
-                    updateConnectionStatus(true, 'Connected');
-                    
-                    // Subscribe to price updates
-                    webSocketClient.subscribe('/topic/prices', (message) => {
-                        console.log('[WebSocket] Received message on /topic/prices:', message);
+            connect() {
+                // Return existing connection promise if already connecting or connected
+                if (this.connectionPromise) {
+                    return this.connectionPromise;
+                }
+                
+                if (this.isConnected) {
+                    console.log('WebSocket already connected');
+                    return Promise.resolve();
+                }
+                
+                this.isConnecting = true;
+                console.log('Connecting to WebSocket server...');
+                
+                // Update UI immediately
+                this.connectionCallbacks.forEach(cb => {
+                    try {
+                        cb && cb();
+                    } catch (e) {
+                        console.error('Error in connection callback:', e);
+                    }
+                });
+                
+                // Connect the underlying WebSocket client
+                return this.connectionPromise = this.client.connect()
+                    .then(() => {
+                        this.isConnected = true;
+                        this.isConnecting = false;
                         
-                        try {
-                            // Handle different message formats
-                            if (Array.isArray(message)) {
-                                // Handle array of updates
-                                message.forEach(update => {
-                                    if (update) {
-                                        updateCryptoCard(update);
-                                    }
-                                });
-                            } else if (typeof message === 'object' && message !== null) {
-                                // Handle single update object
-                                updateCryptoCard(message);
-                            } else if (typeof message === 'string') {
-                                try {
-                                    // Try to parse string as JSON
-                                    const parsed = JSON.parse(message);
-                                    if (Array.isArray(parsed)) {
-                                        parsed.forEach(update => updateCryptoCard(update));
-                                    } else {
-                                        updateCryptoCard(parsed);
-                                    }
-                                } catch (e) {
-                                    console.warn('Failed to parse message as JSON:', message);
-                                }
-                            } else {
-                                console.warn('Received message in unexpected format:', message);
+                        // Resubscribe to any existing subscriptions
+                        const subscriptionPromises = [];
+                        this.subscriptions.forEach((_, destination) => {
+                            subscriptionPromises.push(
+                                this.subscribe(destination, this.messageHandlers.get(destination))
+                            );
+                        });
+                        
+                        return Promise.all(subscriptionPromises);
+                    })
+                    .then(() => {
+                        this.connectionCallbacks.forEach(cb => {
+                            try {
+                                cb && cb();
+                            } catch (e) {
+                                console.error('Error in connection callback:', e);
                             }
-                        } catch (error) {
-                            console.error('Error processing WebSocket message:', error);
-                            console.error('Message that caused the error:', message);
-                        }
+                        });
+                    })
+                    .catch(error => {
+                        this.isConnected = false;
+                        this.isConnecting = false;
+                        this.connectionPromise = null; // Clear the promise on error
+                        console.error('WebSocket connection failed:', error);
+                        return Promise.reject(error);
+                    })
+                    .finally(() => {
+                        this.connectionPromise = null; // Clear the promise when done
                     });
+            }
+
+    subscribe(destination, callback) {
+        if (!destination || typeof callback !== 'function') {
+            console.error('Invalid subscription parameters:', { destination, callback });
+            return Promise.reject(new Error('Invalid subscription parameters'));
+        }
+
+        // Store the subscription
+        this.subscriptions.set(destination, true);
+        this.messageHandlers.set(destination, callback);
+
+        // If not connected, the subscription will be established after connection
+        if (!this.isConnected) {
+            console.warn(`Not connected. Subscription to ${destination} will be established when connected.`);
+            return Promise.resolve();
+        }
+
+        console.log(`Subscribing to ${destination}`);
+
+        return new Promise((resolve, reject) => {
+            try {
+                this.client.subscribe(destination, (message) => {
+                    try {
+                        if (typeof message === 'string') {
+                            try {
+                                message = JSON.parse(message);
+                            } catch (e) {
+                                console.warn('Received non-JSON message:', message);
+                                return;
+                            }
+                        }
+                        callback(message);
+                    } catch (error) {
+                        console.error(`Error processing message from ${destination}:`, error, message);
+                    }
+                });
+                resolve();
+            } catch (error) {
+                console.error(`Failed to subscribe to ${destination}:`, error);
+                reject(error);
+            }
+        });
+    }
+    
+    // Clean up any remaining code that might be causing issues
+    // The subscribe method is now properly defined above
+    
+    onConnect(callback) {
+        if (typeof callback === 'function') {
+            this.connectionCallbacks.push(callback);
+        }
+    }
+            
+    onDisconnect(callback) {
+        if (typeof callback === 'function') {
+            this.disconnectionCallbacks.push(callback);
+        }
+    }
+    
+    send(destination, headers = {}, body = {}) {
+        if (!this.isConnected) {
+            console.warn('Cannot send message: WebSocket not connected');
+            return Promise.reject(new Error('WebSocket not connected'));
+        }
+        
+        return new Promise((resolve, reject) => {
+            try {
+                // Ensure headers and body are properly formatted
+                const message = {
+                    destination: destination,
+                    headers: headers,
+                    body: JSON.stringify(body)
+                };
+                
+                // Send the message through the socket
+                this.client.send(JSON.stringify(message));
+                resolve();
+            } catch (e) {
+                console.error('Error sending message:', e);
+                reject(e);
+            }
+        });
+    }
+    
+    /**
+     * Fetch cryptocurrency data from the server
+     */
+    fetchCryptoData() {
+        const container = document.getElementById('cryptoContainer');
+        if (container) {
+            container.innerHTML = `
+                <div class="col-12 text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading cryptocurrency data...</p>
+                </div>
+                `;
+            }
+            
+            // Make API call to fetch initial data
+            fetch('/api/crypto')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Received cryptocurrency data:', data);
+                    // Ensure data is an array before updating
+                    if (Array.isArray(data)) {
+                        this.updateCryptoList(data);
+                    } else {
+                        throw new Error('Invalid data format received from server');
+                    }
                 })
                 .catch(error => {
-                    console.error('Failed to connect to WebSocket:', error);
-                    updateConnectionStatus(false, 'Connection failed');
-                });
-            
-            // Load initial data
-            fetchCryptoData();
-        });
-
-        // Function to update connection status in the UI
-        function updateConnectionStatus(connected, message) {
-            const statusElement = document.getElementById('connectionStatus');
-            const textElement = document.getElementById('connectionText');
-            const navbar = document.querySelector('.navbar');
-            
-            // Remove all existing status classes
-            statusElement.classList.remove('connected', 'disconnected', 'connecting');
-            
-            if (connected) {
-                // Connected state
-                statusElement.classList.add('connected');
-                textElement.textContent = 'Connected';
-                textElement.className = 'text-light';
-                
-                // Flash the navbar green briefly to indicate successful connection
-                navbar.style.transition = 'background-color 0.5s ease';
-                navbar.style.backgroundColor = '#1e7e34';
-                setTimeout(() => {
-                    navbar.style.backgroundColor = '';
-                    setTimeout(() => navbar.style.transition = '', 500);
-                }, 1000);
-                
-            } else if (message && message.includes('Reconnecting')) {
-                // Reconnecting state
-                statusElement.classList.add('connecting');
-                textElement.textContent = message;
-                textElement.className = 'text-warning';
-                
-            } else {
-                // Disconnected state
-                statusElement.classList.add('disconnected');
-                textElement.textContent = message || 'Disconnected';
-                textElement.className = 'text-warning';
-                
-                // Flash the navbar red to indicate disconnection
-                navbar.style.transition = 'background-color 0.5s ease';
-                navbar.style.backgroundColor = '#bd2130';
-                setTimeout(() => {
-                    navbar.style.backgroundColor = '';
-                    setTimeout(() => navbar.style.transition = '', 500);
-                }, 1000);
-            }
-            
-            // Add a timestamp to the status
-            const timeElement = document.getElementById('connectionTime');
-            if (!timeElement) {
-                const timeSpan = document.createElement('span');
-                timeSpan.id = 'connectionTime';
-                timeSpan.className = 'ms-2 text-muted small';
-                textElement.parentNode.appendChild(timeSpan);
-            }
-            const now = new Date();
-            document.getElementById('connectionTime').textContent = `(${now.toLocaleTimeString()})`;
-        }
-
-        // Function to update a crypto card in the UI
-        function updateCryptoCard(update) {
-            try {
-                // Log the received update for debugging
-                console.log('[UI] Received update:', update);
-                
-                // Handle different message formats
-                let symbol, price, priceChange, timestamp, priceChangePercent;
-                
-                // Format 1: Direct update from our backend
-                if (update.symbol) {
-                    symbol = update.symbol.toUpperCase();
-                    price = update.newPrice || update.price || update.lastPrice || update.c || update[1]?.c?.[0];
-                    priceChange = update.priceChange || update.change24h || update[1]?.p?.[1];
-                    timestamp = update.timestamp || update.time || update[1]?.t?.[1] || new Date().getTime();
-                    priceChangePercent = update.priceChangePercent || update.change24hPercent || update[1]?.P?.[1];
-                }
-                // Format 2: Raw Kraken ticker update
-                else if (Array.isArray(update) && update.length >= 4) {
-                    symbol = update[3];
-                    const tickerData = update[1];
-                    if (tickerData && tickerData.c) {
-                        price = tickerData.c[0]; // Last trade price
-                        priceChange = tickerData.p[1]; // 24h price change
-                        priceChangePercent = tickerData.P[1]; // 24h price change percent
-                        timestamp = tickerData.t[1]; // Timestamp of last trade
-                    }
-                }
-                
-                // Validate required fields
-                if (!symbol) {
-                    console.error('Received update with no symbol:', update);
-                    return;
-                }
-                
-                if (price === undefined) {
-                    console.warn(`No price found in update for ${symbol}:`, update);
-                    return;
-                }
-                
-                // Find the card element
-                const card = document.getElementById(`crypto-${symbol}`);
-                if (!card) {
-                    console.log(`Card for ${symbol} not found, skipping update`);
-                    return;
-                }
-                
-                // Update price with animation
-                const priceElement = card.querySelector('.card-price');
-                if (priceElement) {
-                    const lastPrice = priceElement.dataset.lastPrice ? 
-                        parseFloat(priceElement.dataset.lastPrice) : null;
-                    const currentPrice = parseFloat(price);
-                    
-                    // Add visual feedback for price changes
-                    if (lastPrice !== null) {
-                        if (currentPrice > lastPrice) {
-                            // Price went up
-                            priceElement.classList.remove('text-danger', 'text-muted');
-                            priceElement.classList.add('text-success', 'price-up');
-                            
-                            // Flash the card green briefly
-                            card.classList.add('bg-success', 'bg-opacity-10');
-                            setTimeout(() => {
-                                card.classList.remove('bg-success', 'bg-opacity-10');
-                            }, 1000);
-                            
-                        } else if (currentPrice < lastPrice) {
-                            // Price went down
-                            priceElement.classList.remove('text-success', 'text-muted');
-                            priceElement.classList.add('text-danger', 'price-down');
-                            
-                            // Flash the card red briefly
-                            card.classList.add('bg-danger', 'bg-opacity-10');
-                            setTimeout(() => {
-                                card.classList.remove('bg-danger', 'bg-opacity-10');
-                            }, 1000);
-                            
-                        } else {
-                            // Price unchanged
-                            priceElement.classList.remove('text-success', 'text-danger');
-                            priceElement.classList.add('text-muted');
-                        }
-                        
-                        // Remove animation classes after they complete
-                        setTimeout(() => {
-                            priceElement.classList.remove('price-up', 'price-down');
-                        }, 1500);
-                    } else {
-                        // First time setting price
-                        priceElement.classList.add('text-muted');
-                    }
-                    
-                    // Update the price with a smooth transition
-                    priceElement.style.transition = 'color 0.3s ease, transform 0.3s ease';
-                    priceElement.style.display = 'inline-block';
-                    
-                    // Add a slight bounce effect
-                    priceElement.style.transform = 'scale(1.1)';
-                    setTimeout(() => {
-                        priceElement.style.transform = 'scale(1)';
-                    }, 150);
-                    
-                    // Update the price text
-                    priceElement.textContent = formatPrice(price);
-                    priceElement.dataset.lastPrice = price;
-                }
-                
-                // Update price change
-                const changeElement = card.querySelector('.price-change');
-                if (changeElement && (priceChange !== undefined || priceChangePercent !== undefined)) {
-                    const changeValue = priceChangePercent !== undefined ? 
-                        formatPercentChange(priceChangePercent) : 
-                        (priceChange !== undefined ? formatPrice(priceChange) : '');
-                    
-                    changeElement.textContent = changeValue;
-                    
-                    // Set color based on positive/negative change
-                    if (priceChangePercent !== undefined) {
-                        const isPositive = parseFloat(priceChangePercent) >= 0;
-                        changeElement.className = `price-change ${isPositive ? 'text-success' : 'text-danger'}`;
-                    } else if (priceChange !== undefined) {
-                        const isPositive = parseFloat(priceChange) >= 0;
-                        changeElement.className = `price-change ${isPositive ? 'text-success' : 'text-danger'}`;
-                    }
-                }
-                
-                // Update timestamp
-                const lastUpdatedElement = card.querySelector('.last-updated');
-                if (lastUpdatedElement && timestamp) {
-                    const date = new Date(parseInt(timestamp, 10));
-                    lastUpdatedElement.textContent = `Last updated: ${date.toLocaleTimeString()}`;
-                    lastUpdatedElement.title = date.toString();
-                }
-                
-                // Log the update
-                console.log(`[UI] Updated ${symbol} price to ${price}${priceChangePercent ? ` (${priceChangePercent}%)` : ''}`);
-                
-            } catch (error) {
-                console.error('Error updating crypto card:', error);
-                console.error('Update data that caused the error:', update);
-            }
-        }
-
-        // Function to fetch initial crypto data
-        async function fetchCryptoData() {
-            try {
-                console.log('Fetching initial crypto data...');
-                const response = await fetch('http://localhost:8091/api/crypto');
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                console.log('Fetched crypto data:', data);
-                
-                // Update UI with initial data
-                updateCryptoList(data);
-                updateLastUpdated();
-                
-            } catch (error) {
-                console.error('Error fetching crypto data:', error);
-                updateConnectionStatus(false, 'Failed to load data');
-                
-                const container = document.getElementById('cryptoContainer');
-                if (container) {
-                    container.innerHTML = `
-                        <div class="col-12">
-                            <div class="alert alert-danger" role="alert">
-                                Failed to load cryptocurrency data. Please try again later.
-                                <button class="btn btn-sm btn-outline-secondary ms-2" onclick="fetchCryptoData()">
-                                    Retry
+                    console.error('Error fetching cryptocurrency data:', error);
+                    if (container) {
+                        container.innerHTML = `
+                            <div class="col-12 text-center text-danger">
+                                <p>Error loading cryptocurrency data. Please try again later.</p>
+                                <p class="small text-muted">${error.message}</p>
+                                <button class="btn btn-primary btn-sm" onclick="window.webSocketManager.fetchCryptoData()">
+                                    <i class="bi bi-arrow-clockwise"></i> Retry
                                 </button>
                             </div>
-                        </div>
-                    `;
-                }
-            }
+                        `;
+                    }
+                });
         }
-
-        // Function to update the crypto list in the UI
-        function updateCryptoList(cryptoList) {
+        
+        /**
+         * Update the cryptocurrency list in the UI
+         * @param {Array} cryptoList - Array of cryptocurrency data
+         */
+        updateCryptoList(cryptoList) {
+            console.log('Updating crypto list with:', cryptoList);
             const container = document.getElementById('cryptoContainer');
-            if (!container) return;
-            
-            if (!cryptoList || cryptoList.length === 0) {
+            if (!container) {
+                console.error('Crypto container not found');
+                return;
+            }
+
+            if (!Array.isArray(cryptoList) || cryptoList.length === 0) {
                 container.innerHTML = `
-                    <div class="col-12">
-                        <div class="alert alert-warning" role="alert">
-                            No cryptocurrency data available.
-                        </div>
+                    <div class="col-12 text-center">
+                        <p>No cryptocurrency data available.</p>
                     </div>
                 `;
                 return;
             }
-            
-            // Simple fallback for crypto icons
-            function getCryptoIcon(symbol) {
-                const icons = {
-                    'BTC': '₿', 'ETH': 'Ξ', 'XRP': '✕', 'LTC': 'Ł', 
-                    'BCH': 'Ƀ', 'BNB': '₿', 'EOS': 'ε', 'XLM': '*',
-                    'TRX': '₮', 'XTZ': 'ꜩ', 'ATOM': '⚛', 'LINK': '🔗',
-                    'DOT': '●', 'ADA': '₳', 'XMR': 'ɱ', 'DASH': 'Đ',
-                    'ZEC': 'ⓩ', 'DOGE': 'Ð', 'VET': 'ᐯ', 'FIL': '⨎',
-                    'SOL': '◎', 'UNI': '🦄', 'AAVE': '🦇', 'GRT': '🌐',
-                    'SNX': '₴', 'COMP': '🦄', 'MKR': '��', 'YFI': '🏦',
-                    'SUSHI': '🍣', 'CRV': '🔄', 'BAL': '⚖', 'REN': '🏛',
-                    'NEO': 'N', 'ETC': 'ξ', 'XEM': 'X', 'ZIL': 'Z',
-                    'QTUM': 'Q', 'ICX': '⚡', 'WAVES': 'W', 'ONT': 'O',
-                    'ZRX': 'Z', 'ALGO': 'Ⱥ', 'BAT': '🦇', 'OMG': 'OMG',
-                    'KSM': 'K', 'AVAX': 'A', 'FTM': 'F', 'MATIC': 'M',
-                    'NEAR': 'Ⓝ', 'ONE': '1', 'EGLD': 'eGLD', 'CELO': 'C'
-                };
-                return icons[symbol] || symbol;
-            }
-            
-            container.innerHTML = cryptoList.map(crypto => `
-                <div class="col-md-4 mb-4" id="crypto-${crypto.symbol}">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h5 class="card-title mb-0">
-                                    <span class="crypto-icon me-2" style="display: inline-block; width: 24px; text-align: center;">
-                                        ${getCryptoIcon(crypto.symbol)}
-                                    </span>
-                                    ${crypto.name} (${crypto.symbol})
-                                </h5>
-                                <span class="badge bg-primary">#${crypto.id || 'N/A'}</span>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <div class="fs-4 fw-bold card-price">${formatPrice(crypto.currentPrice)}</div>
-                                    <div class="text-muted">Price (USD)</div>
-                                </div>
-                                <div class="text-end">
-                                    <div class="fs-5 fw-bold card-change text-muted">
-                                        <!-- 24h change not available in the API -->
-                                        --%
+
+            // Create rows of 3 cards each
+            let html = '';
+            for (let i = 0; i < cryptoList.length; i += 3) {
+                html += '<div class="row mb-4">';
+                for (let j = 0; j < 3 && (i + j) < cryptoList.length; j++) {
+                    const crypto = cryptoList[i + j];
+                    html += `
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 crypto-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h5 class="card-title mb-0">${crypto.symbol || 'N/A'}</h5>
+                                        <span class="badge bg-primary">${crypto.name || 'N/A'}</span>
                                     </div>
-                                    <div class="text-muted">24h</div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="h4 mb-0">${formatPrice(crypto.price)}</span>
+                                        <span class="badge ${crypto.percentChange24h >= 0 ? 'bg-success' : 'bg-danger'}">
+                                            ${formatPercentChange(crypto.percentChange24h)}
+                                        </span>
+                                    </div>
+                                    <div class="d-flex justify-content-between text-muted small">
+                                        <span>24h Change</span>
+                                        <span>${formatPrice(crypto.priceChange24h)}</span>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-transparent border-top-0">
+                                    <button class="btn btn-sm btn-outline-primary w-100"
+                                            onclick="webSocketManager.showTradeModal('${crypto.symbol}', '${crypto.name}')">
+                                        Trade
+                                    </button>
                                 </div>
                             </div>
-                        </div>
-                        <div class="card-footer bg-transparent">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-muted">
-                                    Last updated: ${new Date(crypto.lastUpdated).toLocaleTimeString()}
-                                </small>
-                                <button class="btn btn-sm btn-outline-primary" 
-                                        onclick="showTradeModal('${crypto.symbol}', '${crypto.name}')">
-                                    Trade
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
+                        </div>`;
+                }
+                html += '</div>';
+            }
 
-        // Function to update the last updated timestamp
-        function updateLastUpdated() {
-            const now = new Date();
-            const timeElement = document.getElementById('lastUpdated');
-            if (timeElement) {
-                timeElement.textContent = `Last updated: ${now.toLocaleTimeString()}`;
+            // Update the last updated timestamp
+            this.updateLastUpdated();
+        }
+        
+        /**
+         * Update the last updated timestamp in the UI
+         */
+        updateLastUpdated() {
+            const lastUpdatedElement = document.getElementById('lastUpdated');
+            if (lastUpdatedElement) {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString();
+                lastUpdatedElement.textContent = `Last updated: ${timeString}`;
             }
         }
-
-        // Function to show trade modal
-        function showTradeModal(symbol, name) {
+        
+        /**
+         * Show the trade modal for a specific cryptocurrency
+         * @param {string} symbol - The cryptocurrency symbol
+         * @param {string} name - The cryptocurrency name
+         */
+        showTradeModal(symbol, name) {
             const modal = new bootstrap.Modal(document.getElementById('tradeModal'));
             const modalTitle = document.getElementById('tradeModalLabel');
             const cryptoName = document.getElementById('cryptoName');
             
-            if (modalTitle) modalTitle.textContent = `Trade ${name} (${symbol.toUpperCase()})`;
-            if (cryptoName) cryptoName.textContent = name;
-            
-            modal.show();
+            if (modalTitle && cryptoName) {
+                modalTitle.textContent = `Trade ${symbol}`;
+                cryptoName.textContent = name;
+                modal.show();
+            }
         }
+    }
+
+    // Track connection state
+    let isFirstConnection = true;
+    let wsManager; // Will hold the WebSocket manager instance
+    
+    // Initialize the application
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initialize WebSocket manager if not already initialized
+        if (!window.webSocketManager) {
+            wsManager = new WebSocketManager();
+            window.webSocketManager = wsManager; // Make it globally available
+        } else {
+            wsManager = window.webSocketManager;
+        }
+        
+        // Initial data fetch
+        wsManager.fetchCryptoData();
+        
+        // Update UI when connection status changes
+        function updateConnectionStatus() {
+            const statusElement = document.getElementById('connectionStatus');
+            const statusText = document.getElementById('connectionText');
+            const connectButton = document.getElementById('connectButton');
+            
+            if (!statusElement || !statusText || !connectButton) {
+                console.error('Required DOM elements not found');
+                return;
+            }
+            
+            // Clear all status classes
+            statusElement.className = 'connection-status';
+            
+            if (wsManager.isConnected) {
+                // Connected state
+                statusElement.classList.add('connected');
+                statusText.textContent = 'Connected';
+                connectButton.innerHTML = '<i class="bi bi-plug"></i> <span class="d-none d-sm-inline">Connected</span>';
+                connectButton.classList.remove('btn-outline-primary', 'btn-outline-warning', 'disabled');
+                connectButton.classList.add('btn-outline-success');
+                
+                // Subscribe to topics after first connection
+                if (isFirstConnection) {
+                    isFirstConnection = false;
+                    subscribeToTopics();
+                }
+            } else if (wsManager.isConnecting) {
+                // Connecting state
+                statusElement.classList.add('connecting');
+                statusText.textContent = 'Connecting...';
+                connectButton.innerHTML = '<i class="bi bi-hourglass-split"></i> <span class="d-none d-sm-inline">Connecting</span>';
+                connectButton.classList.remove('btn-outline-primary', 'btn-outline-success');
+                connectButton.classList.add('btn-outline-warning', 'disabled');
+            } else {
+                // Disconnected state
+                statusElement.classList.add('disconnected');
+                statusText.textContent = 'Disconnected';
+                connectButton.innerHTML = '<i class="bi bi-plug"></i> <span class="d-none d-sm-inline">Connect</span>';
+                connectButton.classList.remove('btn-outline-success', 'btn-outline-warning', 'disabled');
+                connectButton.classList.add('btn-outline-primary');
+            }
+            
+            // Enable/disable buttons based on connection state
+            const buttons = ['sendTestMessage', 'sendBroadcast', 'connectionInfo'];
+            buttons.forEach(btnId => {
+                const btn = document.getElementById(btnId);
+                if (btn) {
+                    btn.disabled = !wsManager.isConnected;
+                    btn.classList.toggle('btn-disabled', !wsManager.isConnected);
+                }
+            });
+        }
+        
+        // Subscribe to WebSocket topics
+        function subscribeToTopics() {
+            console.log('Subscribing to WebSocket topics...');
+            
+            // Subscribe to price updates
+            try {
+                wsManager.subscribe('/topic/prices', (priceUpdate) => {
+                    try {
+                        console.log('Received price update:', priceUpdate);
+                        updateCryptoCard(priceUpdate);
+                    } catch (error) {
+                        console.error('Error processing price update:', error, priceUpdate);
+                    }
+                });
+                console.log('Subscribed to /topic/prices');
+            } catch (error) {
+                console.error('Failed to subscribe to /topic/prices:', error);
+            }
+            
+            // Subscribe to general updates
+            try {
+                wsManager.subscribe('/topic/updates', (update) => {
+                    try {
+                        console.log('Received update:', update);
+                        // Handle general updates if needed
+                    } catch (error) {
+                        console.error('Error processing update:', error, update);
+                    }
+                });
+                console.log('Subscribed to /topic/updates');
+            } catch (error) {
+                console.error('Failed to subscribe to /topic/updates:', error);
+            }
+            
+            // Subscribe to broadcast messages
+            try {
+                wsManager.subscribe('/topic/broadcast', (message) => {
+                    try {
+                        console.log('Received broadcast:', message);
+                        const notification = typeof message === 'object' ? message.message : message;
+                        showNotification(notification || 'New broadcast message', 'info');
+                    } catch (error) {
+                        console.error('Error processing broadcast:', error, message);
+                    }
+                });
+                console.log('Subscribed to /topic/broadcast');
+            } catch (error) {
+                console.error('Failed to subscribe to /topic/broadcast:', error);
+            }
+            
+            // Subscribe to private messages (user-specific queue)
+            try {
+                wsManager.subscribe('/user/queue/notifications', (message) => {
+                    try {
+                        console.log('Received private message:', message);
+                        const msgText = typeof message === 'object' ? message.message : message;
+                        showNotification(`Private: ${msgText}`, 'private');
+                    } catch (error) {
+                        console.error('Error processing private message:', error, message);
+                    }
+                });
+                console.log('Subscribed to /user/queue/notifications');
+            } catch (error) {
+                console.error('Failed to subscribe to /user/queue/notifications:', error);
+            }
+            
+            // Send a test message to verify the connection
+            if (wsManager.isConnected) {
+                const testMessage = {
+                    action: 'connection_test',
+                    timestamp: new Date().toISOString(),
+                    clientInfo: {
+                        userAgent: navigator.userAgent,
+                        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                        screenResolution: `${window.screen.width}x${window.screen.height}`
+                    }
+                };
+                
+                wsManager.send('/app/test/echo', {}, testMessage)
+                    .then(() => console.log('Test message sent successfully'))
+                    .catch(err => {
+                        console.error('Failed to send test message:', err);
+                        showNotification('Failed to verify connection with the server', 'error');
+                    });
+            } else {
+                console.warn('Not connected, skipping test message');
+            }
+        }
+        
+        // Set up event listeners for WebSocket manager
+        function setupWebSocketEventListeners() {
+            // Initial UI update
+            updateConnectionStatus();
+            
+            // Set up connection status callbacks
+            wsManager.onConnect(() => {
+                console.log('onConnect callback triggered');
+                updateConnectionStatus();
+            });
+            
+            wsManager.onDisconnect(() => {
+                console.log('onDisconnect callback triggered');
+                updateConnectionStatus();
+            });
+            
+            // Set up manual connection button
+            const connectButton = document.getElementById('connectButton');
+            if (connectButton) {
+                connectButton.addEventListener('click', () => {
+                    if (!wsManager.isConnected && !wsManager.isConnecting) {
+                        console.log('Manually initiating WebSocket connection...');
+                        wsManager.connect()
+                            .then(() => {
+                                console.log('Manual connection successful');
+                                showNotification('Connected to WebSocket server', 'success');
+                            })
+                            .catch(error => {
+                                console.error('Manual connection failed:', error);
+                                showNotification(`Connection failed: ${error.message}`, 'error');
+                            });
+                    } else if (wsManager.isConnecting) {
+                        console.log('Connection already in progress');
+                        showNotification('Connection in progress...', 'info');
+                    } else {
+                        console.log('Already connected to WebSocket server');
+                        showNotification('Already connected', 'info');
+                    }
+                });
+            }
+            
+            // Set up send test message button
+            const testMessageButton = document.getElementById('sendTestMessage');
+            if (testMessageButton) {
+                testMessageButton.addEventListener('click', () => {
+                    if (wsManager.isConnected) {
+                        const testMessage = {
+                            action: 'manual_test',
+                            message: 'This is a test message from the UI',
+                            timestamp: new Date().toISOString()
+                        };
+                        
+                        wsManager.send('/app/test/echo', {}, testMessage)
+                            .then(() => showNotification('Test message sent', 'success'))
+                            .catch(error => {
+                                console.error('Failed to send test message:', error);
+                                showNotification('Failed to send test message', 'error');
+                            });
+                    } else {
+                        showNotification('Not connected to WebSocket server', 'error');
+                    }
+                });
+            }
+            
+            // Set up broadcast test button
+            const broadcastButton = document.getElementById('sendBroadcast');
+            if (broadcastButton) {
+                broadcastButton.addEventListener('click', () => {
+                    const message = prompt('Enter broadcast message:');
+                    if (message) {
+                        fetch('/api/ws-test/broadcast', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: `message=${encodeURIComponent(message)}`
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => showNotification(data.message || 'Broadcast sent', 'success'))
+                        .catch(error => showNotification(`Error: ${error.message}`, 'error'));
+                    }
+                });
+            }
+            
+            // Set up connection info button
+            const infoButton = document.getElementById('connectionInfo');
+            if (infoButton) {
+                infoButton.addEventListener('click', () => {
+                    fetch('/api/ws-test/connection-info')
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            const info = [
+                                `Status: ${wsManager.getConnectionStatus()}`,
+                                `Active Sessions: ${data.activeConnections || 'N/A'}`,
+                                `Test Messages: ${data.testMessageCount || '0'}`,
+                                `Last Updated: ${new Date(data.timestamp || Date.now()).toLocaleString()}`,
+                                `Reconnect Attempts: ${wsManager.reconnectAttempts}`
+                            ];
+                            alert(info.join('\n'));
+                        })
+                        .catch(error => {
+                            console.error('Error fetching connection info:', error);
+                            showNotification(`Error: ${error.message}`, 'error');
+                        });
+                });
+            }
+            
+            // Initial connection attempt
+            console.log('Initiating initial WebSocket connection...');
+            wsManager.connect()
+                .then(() => {
+                    console.log('Initial WebSocket connection established');
+                })
+                .catch(error => {
+                    console.error('Initial WebSocket connection failed:', error);
+                    showNotification('Failed to connect to WebSocket server', 'error');
+                });
+            
+            // Handle page unload to clean up resources
+            window.addEventListener('beforeunload', () => {
+                console.log('Page unloading, cleaning up WebSocket resources...');
+                if (wsManager) {
+                    wsManager.destroy();
+                }
+            });
+        }
+            
+        // Notification system
+        const notificationSystem = (function() {
+            // Create notification container if it doesn't exist
+            let notificationContainer = document.getElementById('notification-container');
+            if (!notificationContainer) {
+                notificationContainer = document.createElement('div');
+                notificationContainer.id = 'notification-container';
+                document.body.appendChild(notificationContainer);
+            }
+            
+            // Add styles for notifications
+            const style = document.createElement('style');
+            style.textContent = `
+                #notification-container {
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    z-index: 1100;
+                    max-width: 350px;
+                    overflow: hidden;
+                }
+                
+                .notification {
+                    position: relative;
+                    padding: 15px 20px;
+                    margin-bottom: 10px;
+                    border-radius: 4px;
+                    color: white;
+                    background: #333;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                    transform: translateX(120%);
+                    animation: slideIn 0.3s forwards;
+                    display: flex;
+                    align-items: center;
+                    max-width: 100%;
+                    box-sizing: border-box;
+                }
+                
+                .notification-close {
+                    background: none;
+                    border: none;
+                    color: white;
+                    font-size: 18px;
+                    cursor: pointer;
+                    margin-left: 15px;
+                    opacity: 0.7;
+                    padding: 0 5px;
+                    line-height: 1;
+                }
+                
+                .notification-close:hover {
+                    opacity: 1;
+                }
+                
+                .notification-icon {
+                    margin-right: 10px;
+                    font-size: 20px;
+                }
+                
+                .notification-content {
+                    flex: 1;
+                    word-break: break-word;
+                }
+                
+                .notification.info { background-color: #3498db; }
+                .notification.success { background-color: #2ecc71; }
+                .notification.warning { background-color: #f39c12; }
+                .notification.error { background-color: #e74c3c; }
+                .notification.private { 
+                    background-color: #9b59b6;
+                    border-left: 4px solid #8e44ad;
+                }
+                
+                @keyframes slideIn {
+                    to { transform: translateX(0); }
+                }
+                
+                @keyframes fadeOut {
+                    to { opacity: 0; max-height: 0; margin-bottom: 0; padding-top: 0; padding-bottom: 0; }
+                }
+                
+                .notification.fade-out {
+                    animation: fadeOut 0.5s forwards;
+                    overflow: hidden;
+                }`;
+            document.head.appendChild(style);
+            
+            // Icons for different notification types
+            const icons = {
+                info: 'bi-info-circle',
+                success: 'bi-check-circle',
+                warning: 'bi-exclamation-triangle',
+                error: 'bi-x-circle',
+                private: 'bi-shield-lock'
+            };
+            
+            // Show a notification
+            function show(message, type = 'info', duration = 5000) {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                
+                // Add icon
+                const icon = document.createElement('i');
+                icon.className = `bi ${icons[type] || icons.info} notification-icon`;
+                notification.appendChild(icon);
+                
+                // Add message content
+                const content = document.createElement('div');
+                content.className = 'notification-content';
+                content.textContent = typeof message === 'string' ? message : JSON.stringify(message);
+                notification.appendChild(content);
+                
+                // Add close button
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'notification-close';
+                closeBtn.innerHTML = '&times;';
+                closeBtn.onclick = () => removeNotification(notification);
+                notification.appendChild(closeBtn);
+                
+                // Add to container
+                notificationContainer.appendChild(notification);
+                
+            // Auto-remove after duration
+            if (duration > 0) {
+                setTimeout(() => {
+                    removeNotification(notification);
+                }, duration);
+            }
+            
+            // Return function to manually remove the notification
+            return {
+                remove: () => removeNotification(notification)
+            };
+        }
+        
+        // Remove a notification with animation
+        function removeNotification(notification) {
+            if (!notification) return;
+            
+            // Start fade out animation
+            notification.classList.add('fade-out');
+            
+            // Remove from DOM after animation completes
+            setTimeout(() => {
+                if (notification.parentNode === notificationContainer) {
+                    notificationContainer.removeChild(notification);
+                }
+            }, 500);
+        }
+        
+        // Public API
+        return {
+            show,
+            info: (msg, duration) => show(msg, 'info', duration),
+            success: (msg, duration) => show(msg, 'success', duration),
+            warning: (msg, duration) => show(msg, 'warning', duration),
+            error: (msg, duration) => show(msg, 'error', duration),
+            private: (msg, duration) => show(msg, 'private', duration)
+        };
+    })();
+    
+    // Alias for backward compatibility
+    function showNotification(message, type = 'info', duration = 5000) {
+        console.log(`[${type.toUpperCase()}]`, message);
+        
+        // Map type to appropriate notification method
+        const notifier = notificationSystem[type] || notificationSystem.info;
+        notifier(message, duration);
+    }
+    
+    // Set up connection status callbacks in WebSocketManager
+    if (wsManager) {
+        // Set up connection handler
+        wsManager.onConnect(() => {
+            console.log('WebSocket client connected successfully');
+            updateConnectionStatus(true, `Connected ${isFirstConnection ? '' : '(Reconnected)'}`);
+            isFirstConnection = false;
+            
+            // Subscribe to price updates
+            wsManager.client.subscribe('/topic/prices', (message) => {
+                console.log('[WebSocket] Received price update:', message);
+                try {
+                    updateCryptoCard(message);
+                } catch (error) {
+                    console.error('Error processing price update:', error, message);
+                }
+            });
+            
+            // Subscribe to test updates
+            wsManager.client.subscribe('/topic/updates', (message) => {
+                console.log('[WebSocket] Received test update:', message);
+                // Just log test updates for now
+            });
+            
+            // Subscribe to test responses
+            wsManager.client.subscribe('/topic/test', (message) => {
+                console.log('[WebSocket] Received test response:', message);
+                // Just log test responses for now
+            });
+            
+            // Send a test message to verify the connection is working
+            const testMessage = { 
+                action: 'test', 
+                timestamp: new Date().toISOString(),
+                clientInfo: 'Trading212 Web Client v1.0'
+            };
+            
+            console.log('Sending test message:', testMessage);
+            
+            wsManager.client.send('/app/test', {}, testMessage)
+                .then(() => console.log('Test message sent successfully'))
+                .catch(err => console.error('Failed to send test message:', err));
+            
+            // Also send a direct message to the test endpoint
+            try {
+                wsManager.client.stompClient.send('/app/test', {}, JSON.stringify({
+                    type: 'direct',
+                    message: 'Direct test message',
+                    timestamp: new Date().toISOString()
+                }));
+                console.log('Direct test message sent');
+            } catch (e) {
+                console.error('Failed to send direct test message:', e);
+            }
+        });
+        
+        // Set up error handler
+        wsManager.client.onError((error) => {
+            console.error('WebSocket error:', error);
+            const errorMessage = error.message || 'Connection error';
+            console.error('WebSocket error details:', errorMessage);
+            updateConnectionStatus(false, `Error: ${errorMessage}`);
+            
+            // Try to reconnect after a delay
+            setTimeout(() => {
+                console.log('Attempting to reconnect...');
+                wsManager.client.connect().catch(err => {
+                    console.error('Reconnection failed:', err);
+                });
+            }, 5000);
+        });
+        
+        // Connect to WebSocket
+        console.log('Connecting to WebSocket...');
+        updateConnectionStatus(false, 'Connecting...');
+        wsManager.client.connect()
+            .then(() => {
+                console.log('WebSocket client connection initiated');
+            })
+            .catch(error => {
+                console.error('Failed to initialize WebSocket connection:', error);
+                updateConnectionStatus(false, 'Connection failed: ' + (error.message || 'Unknown error'));
+                
+                // Try to reconnect after a delay
+                setTimeout(() => {
+                    console.log('Retrying WebSocket connection...');
+                    wsManager.client.connect().catch(err => {
+                        console.error('Retry failed:', err);
+                    });
+                }, 5000);
+            });
+    }
+    
+    // Add a button to test the WebSocket connection
+    const testButton = document.createElement('button');
+    testButton.textContent = 'Test WebSocket';
+    testButton.className = 'btn btn-secondary btn-sm ms-2';
+    testButton.onclick = () => {
+        if (wsManager && wsManager.client && wsManager.client.isConnected) {
+            const testMsg = {
+                action: 'manual_test',
+                timestamp: new Date().toISOString(),
+                message: 'Manual test from button click'
+            };
+            wsManager.client.send('/app/test', {}, testMsg)
+                .then(() => console.log('Manual test message sent'))
+                .catch(err => console.error('Failed to send manual test:', err));
+        } else {
+            alert('WebSocket is not connected. Trying to reconnect...');
+            if (wsManager && wsManager.client) {
+                wsManager.client.connect().catch(err => {
+                    console.error('Manual reconnect failed:', err);
+                });
+            }
+        }
+    };
+    
+    // Add the button to the connection status container
+    const statusContainer = document.querySelector('.connection-status');
+    if (statusContainer) {
+        statusContainer.appendChild(testButton);
+    }
+    
+    // Load initial data
+    fetchCryptoData();
+});
+
+// Function to update connection status in the UI
+function updateConnectionStatus(connected, message) {
+    const statusElement = document.getElementById('connectionStatus');
+    const textElement = document.getElementById('connectionText');
+    const navbar = document.querySelector('.navbar');
+    const dotElement = statusElement ? statusElement.querySelector('.connection-dot') : null;
+    
+    if (!statusElement || !textElement) return;
+    
+    // Remove all existing status classes
+    statusElement.classList.remove('connected', 'disconnected', 'connecting');
+    
+    if (connected) {
+        // Connected state
+        statusElement.classList.add('connected');
+        textElement.textContent = message || 'Connected';
+        textElement.className = '';
+        
+        // Flash the navbar green briefly to indicate successful connection
+        if (navbar) {
+            navbar.style.transition = 'background-color 0.5s ease';
+            navbar.style.backgroundColor = '#1e7e34';
+            setTimeout(() => {
+                navbar.style.backgroundColor = '';
+                setTimeout(() => navbar.style.transition = '', 500);
+            }, 1000);
+        }
+        
+        // Update the connection dot
+        if (dotElement) {
+            dotElement.style.backgroundColor = '#28a745';
+            dotElement.style.boxShadow = '0 0 10px rgba(40, 167, 69, 0.5)';
+        }
+        
+    } else if (message && (message.toLowerCase().includes('connecting') || message.toLowerCase().includes('retry'))) {
+        // Connecting state
+        statusElement.classList.add('connecting');
+        textElement.textContent = message || 'Connecting...';
+        textElement.className = '';
+        
+        // Update the connection dot
+        if (dotElement) {
+            dotElement.style.backgroundColor = '#ffc107';
+            dotElement.style.animation = 'pulse 2s infinite';
+        }
+        
+    } else {
+        // Disconnected state
+        statusElement.classList.add('disconnected');
+        textElement.textContent = message || 'Disconnected';
+        textElement.className = '';
+        
+        // Update the connection dot
+        if (dotElement) {
+            dotElement.style.backgroundColor = '#dc3545';
+            dotElement.style.animation = 'pulse 1.5s infinite';
+        }
+    }
+    
+    // Add a timestamp to the status
+    const timeElement = document.getElementById('connectionTime');
+    if (!timeElement) {
+        const timeSpan = document.createElement('span');
+        timeSpan.id = 'connectionTime';
+        timeSpan.className = 'ms-2 text-muted small';
+        textElement.parentNode.appendChild(timeSpan);
+    }
+    const now = new Date();
+    document.getElementById('connectionTime').textContent = `(${now.toLocaleTimeString()})`;
+}
+
+// Function to update a crypto card in the UI
+function updateCryptoCard(update) {
+    try {
+        // Log the received update for debugging
+        console.log('[UI] Received update:', update);
+        
+        // Handle different message formats
+        let symbol, price, priceChange, timestamp, priceChangePercent;
+        
+        // Format 1: Direct update from our backend
+        if (update.symbol) {
+            symbol = update.symbol.toUpperCase();
+            price = update.newPrice || update.price || update.lastPrice || update.c || update[1]?.c?.[0];
+            priceChange = update.priceChange || update.change24h || update[1]?.p?.[1];
+            timestamp = update.timestamp || update.time || update[1]?.t?.[1] || new Date().getTime();
+            priceChangePercent = update.priceChangePercent || update.change24hPercent || update[1]?.P?.[1];
+        }
+        // Format 2: Raw Kraken ticker update
+        else if (Array.isArray(update) && update.length >= 4) {
+            symbol = update[3];
+            const tickerData = update[1];
+            if (tickerData && tickerData.c) {
+                price = tickerData.c[0]; // Last trade price
+                priceChange = tickerData.p[1]; // 24h price change
+                priceChangePercent = tickerData.P[1]; // 24h price change percent
+                timestamp = tickerData.t[1]; // Timestamp of last trade
+            }
+        }
+        
+        // Validate required fields
+        if (!symbol) {
+            console.error('Received update with no symbol:', update);
+            return;
+        }
+        
+        if (price === undefined) {
+            console.warn(`No price found in update for ${symbol}:`, update);
+            return;
+        }
+        
+        // Find the card element
+        const card = document.getElementById(`crypto-${symbol}`);
+        if (!card) {
+            console.log(`Card for ${symbol} not found, skipping update`);
+            return;
+        }
+        
+        // Update price with animation
+        const priceElement = card.querySelector('.card-price');
+        if (priceElement) {
+            const lastPrice = priceElement.dataset.lastPrice ? 
+                parseFloat(priceElement.dataset.lastPrice) : null;
+            const currentPrice = parseFloat(price);
+            
+            // Add visual feedback for price changes
+            if (lastPrice !== null) {
+                if (currentPrice > lastPrice) {
+                    // Price went up
+                    priceElement.classList.remove('text-danger', 'text-muted');
+                    priceElement.classList.add('text-success', 'price-up');
+                    
+                    // Flash the card green briefly
+                    card.classList.add('bg-success', 'bg-opacity-10');
+                    setTimeout(() => {
+                        card.classList.remove('bg-success', 'bg-opacity-10');
+                    }, 1000);
+                    
+                } else if (currentPrice < lastPrice) {
+                    // Price went down
+                    priceElement.classList.remove('text-success', 'text-muted');
+                    priceElement.classList.add('text-danger', 'price-down');
+                    
+                    // Flash the card red briefly
+                    card.classList.add('bg-danger', 'bg-opacity-10');
+                    setTimeout(() => {
+                        card.classList.remove('bg-danger', 'bg-opacity-10');
+                    }, 1000);
+                    
+                } else {
+                    // Price unchanged
+                    priceElement.classList.remove('text-success', 'text-danger');
+                    priceElement.classList.add('text-muted');
+                }
+                
+                // Remove animation classes after they complete
+                setTimeout(() => {
+                    priceElement.classList.remove('price-up', 'price-down');
+                }, 1500);
+            } else {
+                // First time setting price
+                priceElement.classList.add('text-muted');
+            }
+            
+            // Update the price with a smooth transition
+            priceElement.style.transition = 'color 0.3s ease, transform 0.3s ease';
+            priceElement.style.display = 'inline-block';
+            
+            // Add a slight bounce effect
+            priceElement.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                priceElement.style.transform = 'scale(1)';
+            }, 150);
+            
+            // Update the price text
+            priceElement.textContent = formatPrice(price);
+            priceElement.dataset.lastPrice = price;
+        }
+        
+        // Update price change
+        const changeElement = card.querySelector('.price-change');
+        if (changeElement && (priceChange !== undefined || priceChangePercent !== undefined)) {
+            const changeValue = priceChangePercent !== undefined ? 
+                formatPercentChange(priceChangePercent) : 
+                (priceChange !== undefined ? formatPrice(priceChange) : '');
+            
+            changeElement.textContent = changeValue;
+            
+            // Set color based on positive/negative change
+            if (priceChangePercent !== undefined) {
+                const isPositive = parseFloat(priceChangePercent) >= 0;
+                changeElement.className = `price-change ${isPositive ? 'text-success' : 'text-danger'}`;
+            } else if (priceChange !== undefined) {
+                const isPositive = parseFloat(priceChange) >= 0;
+                changeElement.className = `price-change ${isPositive ? 'text-success' : 'text-danger'}`;
+            }
+        }
+        
+        // Update timestamp
+        const lastUpdatedElement = card.querySelector('.last-updated');
+        if (lastUpdatedElement && timestamp) {
+            const date = new Date(parseInt(timestamp, 10));
+            lastUpdatedElement.textContent = `Last updated: ${date.toLocaleTimeString()}`;
+            lastUpdatedElement.title = date.toString();
+        }
+        
+        // Log the update
+        console.log(`[UI] Updated ${symbol} price to ${price}${priceChangePercent ? ` (${priceChangePercent}%)` : ''}`);
+        
+    } catch (error) {
+        console.error('Error updating crypto card:', error);
+        console.error('Update data that caused the error:', update);
+    }
+}
+
+// Function to fetch initial crypto data
+async function fetchCryptoData() {
+    try {
+        console.log('Fetching initial crypto data...');
+        const response = await fetch('http://localhost:8091/api/crypto');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Fetched crypto data:', data);
+        
+        // Update UI with initial data
+        updateCryptoList(data);
+        updateLastUpdated();
+        
+    } catch (error) {
+        console.error('Error fetching crypto data:', error);
+        updateConnectionStatus(false, 'Failed to load data');
+        
+        const container = document.getElementById('cryptoContainer');
+        if (container) {
+            container.innerHTML = `
+                <div class="col-12">
+                    <div class="alert alert-danger" role="alert">
+                        Failed to load cryptocurrency data. Please try again later.
+                        <button class="btn btn-sm btn-outline-secondary ms-2" onclick="fetchCryptoData()">
+                            Retry
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+    }
+}
+
+// Function to update the crypto list in the UI
+function updateCryptoList(cryptoList) {
+    const container = document.getElementById('cryptoContainer');
+    if (!container) return;
+    
+    if (!cryptoList || cryptoList.length === 0) {
+        container.innerHTML = `
+            <div class="col-12">
+                <div class="alert alert-warning" role="alert">
+                    No cryptocurrency data available.
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    // Simple fallback for crypto icons
+    function getCryptoIcon(symbol) {
+        const icons = {
+            'BTC': '₿', 'ETH': 'Ξ', 'XRP': '✕', 'LTC': 'Ł', 
+            'BCH': 'Ƀ', 'BNB': '₿', 'EOS': 'ε', 'XLM': '*',
+            'TRX': '₮', 'XTZ': 'ꜩ', 'ATOM': '⚛', 'LINK': '🔗',
+            'DOT': '●', 'ADA': '₳', 'XMR': 'ɱ', 'DASH': 'Đ',
+            'ZEC': 'ⓩ', 'DOGE': 'Ð', 'VET': 'ᐯ', 'FIL': '⨎',
+            'SOL': '◎', 'UNI': '🦄', 'AAVE': '🦇', 'GRT': '🌐',
+            'SNX': '₴', 'COMP': '🦄', 'MKR': '��', 'YFI': '🏦',
+            'SUSHI': '🍣', 'CRV': '🔄', 'BAL': '⚖', 'REN': '🏛',
+            'NEO': 'N', 'ETC': 'ξ', 'XEM': 'X', 'ZIL': 'Z',
+            'QTUM': 'Q', 'ICX': '⚡', 'WAVES': 'W', 'ONT': 'O',
+            'ZRX': 'Z', 'ALGO': 'Ⱥ', 'BAT': '🦇', 'OMG': 'OMG',
+            'KSM': 'K', 'AVAX': 'A', 'FTM': 'F', 'MATIC': 'M',
+            'NEAR': 'Ⓝ', 'ONE': '1', 'EGLD': 'eGLD', 'CELO': 'C'
+        };
+        return icons[symbol] || symbol;
+    }
+    
+    container.innerHTML = cryptoList.map(crypto => `
+        <div class="col-md-4 mb-4" id="crypto-${crypto.symbol}">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">
+                            <span class="crypto-icon me-2" style="display: inline-block; width: 24px; text-align: center;">
+                                ${getCryptoIcon(crypto.symbol)}
+                            </span>
+                            ${crypto.name} (${crypto.symbol})
+                        </h5>
+                        <span class="badge bg-primary">#${crypto.id || 'N/A'}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="fs-4 fw-bold card-price">${formatPrice(crypto.currentPrice)}</div>
+                            <div class="text-muted">Price (USD)</div>
+                        </div>
+                        <div class="text-end">
+                            <div class="fs-5 fw-bold card-change text-muted">
+                                <!-- 24h change not available in the API -->
+                                --%
+                            </div>
+                            <div class="text-muted">24h</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            Last updated: ${new Date(crypto.lastUpdated).toLocaleTimeString()}
+                        </small>
+                        <button class="btn btn-sm btn-outline-primary" 
+                                onclick="showTradeModal('${crypto.symbol}', '${crypto.name}')">
+                            Trade
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Function to update the last updated timestamp
+function updateLastUpdated() {
+    const now = new Date();
+    const timeElement = document.getElementById('lastUpdated');
+    if (timeElement) {
+        timeElement.textContent = `Last updated: ${now.toLocaleTimeString()}`;
+    }
+}
+
+// Function to show trade modal
+function showTradeModal(symbol, name) {
+    const modal = new bootstrap.Modal(document.getElementById('tradeModal'));
+    const modalTitle = document.getElementById('tradeModalLabel');
+    const cryptoName = document.getElementById('cryptoName');
+    
+    if (modalTitle) modalTitle.textContent = `Trade ${name} (${symbol.toUpperCase()})`;
+    if (cryptoName) cryptoName.textContent = name;
+    
+    modal.show();
+}
+
+// Debug: Check if WebSocketManager is defined
+console.log('WebSocketManager defined:', typeof WebSocketManager !== 'undefined');
+
+// Initialize the application after the WebSocketManager is defined
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOMContentLoaded: Initializing WebSocketManager...');
+    
+    try {
+        if (typeof WebSocketManager === 'undefined') {
+            throw new Error('WebSocketManager is not defined. Check for JavaScript errors above.');
+        }
+        
+        console.log('Creating new WebSocketManager instance...');
+        const webSocketManager = new WebSocketManager();
+        console.log('WebSocketManager instance created:', webSocketManager);
+        
+        // Make it globally available for debugging
+        window.webSocketManager = webSocketManager;
+        
+        // Initial fetch of crypto data
+        console.log('Fetching initial crypto data...');
+        webSocketManager.fetchCryptoData();
+        console.log('Initial fetch initiated');
+    } catch (error) {
+        console.error('Failed to initialize WebSocketManager:', error);
+        const container = document.getElementById('cryptoContainer');
+        if (container) {
+            container.innerHTML = `
+                <div class="col-12 text-center text-danger">
+                    <p>Failed to initialize WebSocket connection. Please check the console for errors and refresh the page.</p>
+                    <p class="small text-muted">${error.message}</p>
+                    <button class="btn btn-primary btn-sm" onclick="window.location.reload()">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh Page
+                    </button>
+                </div>
+            `;
+        }
+    }
+});
     </script>
 </body>
 </html>

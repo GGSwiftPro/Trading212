@@ -177,7 +177,6 @@ const webSocketClient = (function() {
             isConnected = false;
             return Promise.reject(error);
         }
-        });
     }
     
     function handleReconnect(reject) {
