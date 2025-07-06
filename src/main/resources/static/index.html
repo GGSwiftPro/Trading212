@@ -181,7 +181,7 @@
                 
                 this.connectionPromise = new Promise((resolve, reject) => {
                     try {
-                        const socket = new SockJS('http://localhost:8091/ws');
+                        const socket = new SockJS('http://localhost:8080/ws');
                         this.stompClient = Stomp.over(socket);
                         
                         // Configure debug logging (can be enabled for troubleshooting)
@@ -718,7 +718,7 @@
         async function fetchCryptoData() {
             try {
                 console.log('Fetching initial crypto data...');
-                const response = await fetch('http://localhost:8091/api/crypto');
+                const response = await fetch('http://localhost:8080/api/crypto');
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);

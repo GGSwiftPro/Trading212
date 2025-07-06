@@ -1,5 +1,6 @@
 package com.trading212.Trading212.controller;
 
+import com.trading212.Trading212.dto.ResetAccountResponse;
 import com.trading212.Trading212.model.UserEntity;
 import com.trading212.Trading212.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,12 +32,17 @@ public class UserController {
     }
 
     @PutMapping("/{userId}/reset")
-    public ResponseEntity<?> resetUserAccount(@PathVariable Long userId) {
+    public ResponseEntity<ResetAccountResponse> resetUserAccount(@PathVariable Long userId) {
         return userService.getUserById(userId)
                 .map(user -> {
                     userService.resetUserAccount(userId);
-                    Map<String, String> response = new HashMap<>();
-                    response.put("message", "Account reset successfully");
+                    // Get the updated user to get the new balance
+                    UserEntity updatedUser = userService.getUserById(userId).orElseThrow();
+                    ResetAccountResponse response = new ResetAccountResponse(
+                        userId,
+                        updatedUser.getBalance(),
+                        "Account reset successfully"
+                    );
                     return ResponseEntity.ok(response);
                 })
                 .orElse(ResponseEntity.notFound().build());

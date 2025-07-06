@@ -23,12 +23,17 @@
         const output = document.getElementById('output');
         const status = document.querySelector('#status span');
         let stompClient = null;
+        let reconnectAttempts = 0;
+        const MAX_RECONNECT_ATTEMPTS = 5;
 
         function log(message) {
+            const now = new Date();
+            const timestamp = '[' + now.toLocaleTimeString() + '] ';
             const p = document.createElement('p');
-            p.textContent = message;
+            p.textContent = timestamp + message;
             output.appendChild(p);
             output.scrollTop = output.scrollHeight;
+            console.log(message);
         }
 
         function connect() {
@@ -36,27 +41,62 @@
             const socket = new SockJS('/ws');
             stompClient = Stomp.over(socket);
             
-            stompClient.connect({}, function(frame) {
-                log('Connected: ' + frame);
-                status.textContent = 'Connected';
-                status.className = 'connected';
-                
-                // Subscribe to the price updates
-                stompClient.subscribe('/topic/prices', function(message) {
-                    const update = JSON.parse(message.body);
-                    log(`Price update: ${update.symbol} = $${update.newPrice} (${new Date(update.timestamp).toLocaleTimeString()})`);
-                });
-                
-            }, function(error) {
-                log('Error: ' + error);
-                status.textContent = 'Connection failed';
+            // Disable debug logging
+            stompClient.debug = function() {};
+            
+            stompClient.connect({}, 
+                // Success callback
+                function(frame) {
+                    log('Connected to WebSocket');
+                    reconnectAttempts = 0;
+                    status.textContent = 'Connected';
+                    status.className = 'connected';
+                    
+                    // Subscribe to the price updates
+                    stompClient.subscribe('/topic/prices', function(message) {
+                        try {
+                            const update = JSON.parse(message.body);
+                            log(`Price update: ${update.symbol} = $${update.newPrice}`);
+                        } catch (e) {
+                            log('Error parsing message: ' + e);
+                        }
+                    });
+                }, 
+                // Error callback
+                function(error) {
+                    log('WebSocket connection error: ' + (error.headers ? error.headers.message : error));
+                    status.textContent = 'Connection failed';
+                    status.className = 'disconnected';
+                    
+                    // Attempt to reconnect
+                    if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+                        reconnectAttempts++;
+                        const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000); // Exponential backoff
+                        log(`Attempting to reconnect (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS}) in ${delay/1000}s...`);
+                        setTimeout(connect, delay);
+                    } else {
+                        log('Max reconnection attempts reached. Please refresh the page to try again.');
+                    }
+                }
+            );
+            
+            // Handle WebSocket close event
+            socket.onclose = function() {
+                log('WebSocket connection closed');
+                status.textContent = 'Disconnected';
                 status.className = 'disconnected';
-            });
+            };
         }
 
+        // Auto-connect when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            connect();
+        });
+        
+        // Manual connect button
         document.getElementById('connect').addEventListener('click', function() {
             if (stompClient && stompClient.connected) {
-                log('Already connected');
+                log('Already connected to WebSocket');
                 return;
             }
             connect();
