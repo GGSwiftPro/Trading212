@@ -356,7 +356,7 @@
             ];
             initialData.forEach(updateCryptoCard);
             updateLastUpdated();
-            
+
             // Return a resolved promise since we're not doing any async operations
             return Promise.resolve();
         } catch (error) {
@@ -828,7 +828,7 @@
 
         webSocketClient.onConnect = (frame) => {
             updateConnectionStatus(true, 'Connected');
-            
+
             // Show initial data immediately
             fetchCryptoData().then(() => {
                 console.log('Initial data loaded');
