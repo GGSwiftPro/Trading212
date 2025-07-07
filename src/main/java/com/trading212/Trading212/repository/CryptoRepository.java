@@ -191,6 +191,47 @@ public class CryptoRepository {
         }
     }
     
+    public Optional<CryptoCurrencyEntity> findBySymbol(String symbol) {
+        String sql = "SELECT * FROM cryptocurrencies WHERE symbol = ?";
+        try {
+            CryptoCurrencyEntity crypto = jdbcTemplate.queryForObject(
+                sql, 
+                new CryptocurrencyRowMapper(), 
+                symbol
+            );
+            return Optional.ofNullable(crypto);
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+    
+    @Transactional
+    public void updateUserHolding(Long userId, Long cryptoId, BigDecimal quantityChange) {
+        String checkSql = "SELECT COUNT(*) FROM user_holdings WHERE user_id = ? AND crypto_id = ?";
+        int count = jdbcTemplate.queryForObject(checkSql, Integer.class, userId, cryptoId);
+        
+        if (count > 0) {
+            // Update existing holding
+            String updateSql = "UPDATE user_holdings SET quantity = quantity + ? WHERE user_id = ? AND crypto_id = ?";
+            jdbcTemplate.update(updateSql, quantityChange, userId, cryptoId);
+        } else {
+            // Insert new holding if quantity is positive
+            if (quantityChange.compareTo(BigDecimal.ZERO) > 0) {
+                String insertSql = "INSERT INTO user_holdings (user_id, crypto_id, quantity) VALUES (?, ?, ?)";
+                jdbcTemplate.update(insertSql, userId, cryptoId, quantityChange);
+            }
+        }
+    }
+    
+    public BigDecimal getUserHolding(Long userId, Long cryptoId) {
+        String sql = "SELECT quantity FROM user_holdings WHERE user_id = ? AND crypto_id = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, BigDecimal.class, userId, cryptoId);
+        } catch (Exception e) {
+            return BigDecimal.ZERO;
+        }
+    }
+    
     private boolean tableExists(String tableName) {
         try {
             logger.info("Checking if table {} exists...", tableName);

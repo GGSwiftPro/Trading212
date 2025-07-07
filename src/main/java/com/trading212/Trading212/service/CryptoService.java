@@ -104,18 +104,34 @@ public class CryptoService {
 
     @Transactional
     public void updatePrice(String symbol, BigDecimal newPrice) {
+        if (symbol == null || newPrice == null) {
+            logger.warn("Attempted to update price with null symbol or price");
+            return;
+        }
+        
         // Only update and notify if price has changed
         if (!newPrice.equals(lastPrices.get(symbol))) {
-            cryptoRepo.updatePrice(symbol, newPrice);
-            lastPrices.put(symbol, newPrice);
-            
-            // Send update via WebSocket
-            CryptoPriceUpdate update = new CryptoPriceUpdate(
-                symbol, 
-                newPrice, 
-                Instant.now().toEpochMilli()
-            );
-            messagingTemplate.convertAndSend("/topic/prices", update);
+            try {
+                // Update the price in the database
+                cryptoRepo.updatePrice(symbol, newPrice);
+                logger.debug("Updated price for {} to {}", symbol, newPrice);
+                lastPrices.put(symbol, newPrice);
+                
+                // Create and broadcast the price update
+                CryptoPriceUpdate update = new CryptoPriceUpdate(
+                    symbol, 
+                    newPrice, 
+                    Instant.now().toEpochMilli()
+                );
+                
+                // Send the update via WebSocket
+                messagingTemplate.convertAndSend("/topic/prices", update);
+                logger.trace("Broadcasted price update: {}", update);
+            } catch (Exception e) {
+                logger.error("Failed to process price update for {}: {}", symbol, e.getMessage());
+            }
+        } else {
+            logger.trace("Price for {} unchanged: {}", symbol, newPrice);
         }
     }
 
