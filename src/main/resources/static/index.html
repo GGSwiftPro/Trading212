@@ -331,35 +331,34 @@
 
     async function fetchCryptoData() {
         try {
-            return new Promise(resolve => {
-                setTimeout(() => {
-                    const initialData = [
-                        { symbol: 'BTC', name: 'Bitcoin', currentPrice: 65000.00, percentChange24h: 1.5, volume24h: 50000000000 },
-                        { symbol: 'ETH', name: 'Ethereum', currentPrice: 3500.00, percentChange24h: -0.8, volume24h: 20000000000 },
-                        { symbol: 'BNB', name: 'Binance Coin', currentPrice: 550.00, percentChange24h: 0.5, volume24h: 1500000000 },
-                        { symbol: 'SOL', name: 'Solana', currentPrice: 140.00, percentChange24h: 2.1, volume24h: 3000000000 },
-                        { symbol: 'XRP', currentPrice: 0.52, percentChange24h: 3.2, volume24h: 1500000000 },
-                        { symbol: 'ADA', currentPrice: 0.45, percentChange24h: -1.2, volume24h: 800000000 },
-                        { symbol: 'DOGE', currentPrice: 0.12, percentChange24h: 5.3, volume24h: 1000000000 },
-                        { symbol: 'DOT', currentPrice: 6.50, percentChange24h: -0.8, volume24h: 500000000 },
-                        { symbol: 'AVAX', currentPrice: 35.00, percentChange24h: 1.2, volume24h: 800000000 },
-                        { symbol: 'LINK', currentPrice: 15.50, percentChange24h: -0.5, volume24h: 400000000 },
-                        { symbol: 'MATIC', currentPrice: 0.70, percentChange24h: 2.3, volume24h: 600000000 },
-                        { symbol: 'SHIB', currentPrice: 0.000025, percentChange24h: 8.2, volume24h: 2000000000 },
-                        { symbol: 'LTC', currentPrice: 75.00, percentChange24h: -1.5, volume24h: 300000000 },
-                        { symbol: 'UNI', currentPrice: 7.50, percentChange24h: 0.8, volume24h: 200000000 },
-                        { symbol: 'ATOM', currentPrice: 8.20, percentChange24h: -0.3, volume24h: 150000000 },
-                        { symbol: 'XLM', currentPrice: 0.13, percentChange24h: 1.1, volume24h: 180000000 },
-                        { symbol: 'ALGO', currentPrice: 0.18, percentChange24h: -0.7, volume24h: 90000000 },
-                        { symbol: 'FIL', currentPrice: 5.80, percentChange24h: 1.8, volume24h: 120000000 },
-                        { symbol: 'VET', currentPrice: 0.03, percentChange24h: 0.5, volume24h: 70000000 },
-                        { symbol: 'THETA', currentPrice: 2.10, percentChange24h: -1.2, volume24h: 80000000 }
-                    ];
-                    initialData.forEach(updateCryptoCard);
-                    updateLastUpdated();
-                    resolve();
-                }, 1000);
-            });
+            // Show initial data immediately
+            const initialData = [
+                { symbol: 'BTC', name: 'Bitcoin', currentPrice: 65000.00, percentChange24h: 1.5, volume24h: 50000000000 },
+                { symbol: 'ETH', name: 'Ethereum', currentPrice: 3500.00, percentChange24h: -0.8, volume24h: 20000000000 },
+                { symbol: 'BNB', name: 'Binance Coin', currentPrice: 550.00, percentChange24h: 0.5, volume24h: 1500000000 },
+                { symbol: 'SOL', name: 'Solana', currentPrice: 140.00, percentChange24h: 2.1, volume24h: 3000000000 },
+                { symbol: 'XRP', currentPrice: 0.52, percentChange24h: 3.2, volume24h: 1500000000 },
+                { symbol: 'ADA', currentPrice: 0.45, percentChange24h: -1.2, volume24h: 800000000 },
+                { symbol: 'DOGE', currentPrice: 0.12, percentChange24h: 5.3, volume24h: 1000000000 },
+                { symbol: 'DOT', currentPrice: 6.50, percentChange24h: -0.8, volume24h: 500000000 },
+                { symbol: 'AVAX', currentPrice: 35.00, percentChange24h: 1.2, volume24h: 800000000 },
+                { symbol: 'LINK', currentPrice: 15.50, percentChange24h: -0.5, volume24h: 400000000 },
+                { symbol: 'MATIC', currentPrice: 0.70, percentChange24h: 2.3, volume24h: 600000000 },
+                { symbol: 'SHIB', currentPrice: 0.000025, percentChange24h: 8.2, volume24h: 2000000000 },
+                { symbol: 'LTC', currentPrice: 75.00, percentChange24h: -1.5, volume24h: 300000000 },
+                { symbol: 'UNI', currentPrice: 7.50, percentChange24h: 0.8, volume24h: 200000000 },
+                { symbol: 'ATOM', currentPrice: 8.20, percentChange24h: -0.3, volume24h: 150000000 },
+                { symbol: 'XLM', currentPrice: 0.13, percentChange24h: 1.1, volume24h: 180000000 },
+                { symbol: 'ALGO', currentPrice: 0.18, percentChange24h: -0.7, volume24h: 90000000 },
+                { symbol: 'FIL', currentPrice: 5.80, percentChange24h: 1.8, volume24h: 120000000 },
+                { symbol: 'VET', currentPrice: 0.03, percentChange24h: 0.5, volume24h: 70000000 },
+                { symbol: 'THETA', currentPrice: 2.10, percentChange24h: -1.2, volume24h: 80000000 }
+            ];
+            initialData.forEach(updateCryptoCard);
+            updateLastUpdated();
+            
+            // Return a resolved promise since we're not doing any async operations
+            return Promise.resolve();
         } catch (error) {
             console.error('Failed to fetch initial crypto data:', error);
             throw error;
@@ -829,7 +828,38 @@
 
         webSocketClient.onConnect = (frame) => {
             updateConnectionStatus(true, 'Connected');
-            fetchCryptoData();
+            
+            // Show initial data immediately
+            fetchCryptoData().then(() => {
+                console.log('Initial data loaded');
+            });
+
+            // Subscribe to price updates
+            webSocketClient.subscribe('/topic/prices', (priceUpdate) => {
+                try {
+                    console.log('Received price update:', priceUpdate);
+
+                    // Ensure the price update has the expected structure
+                    if (priceUpdate && priceUpdate.symbol && (priceUpdate.newPrice !== undefined || priceUpdate.price !== undefined)) {
+                        // Normalize the price update to match what updateCryptoCard expects
+                        const normalizedUpdate = {
+                            symbol: priceUpdate.symbol,
+                            currentPrice: parseFloat(priceUpdate.newPrice || priceUpdate.price),
+                            // Use previous values if they exist, otherwise provide defaults
+                            percentChange24h: priceUpdate.percentChange24h || 0,
+                            volume24h: priceUpdate.volume24h || 0,
+                            timestamp: priceUpdate.timestamp || Date.now()
+                        };
+                        console.log('Processing price update:', normalizedUpdate);
+                        updateCryptoCard(normalizedUpdate);
+                        updateLastUpdated();
+                    } else {
+                        console.warn('Received invalid price update format:', priceUpdate);
+                    }
+                } catch (e) {
+                    console.error('Error processing price update:', e, 'Update:', priceUpdate);
+                }
+            });
         };
 
         webSocketClient.onDisconnect = () => {

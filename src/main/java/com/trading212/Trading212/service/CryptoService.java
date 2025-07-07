@@ -135,20 +135,35 @@ public class CryptoService {
         }
     }
 
-    // This method is no longer needed as we're using Kraken WebSocket for real-time updates
-//    @Scheduled(fixedRate = 5000) // Update every 5 seconds
-//    public void simulatePriceUpdates() {
-//        // In a real app, you would fetch actual prices from an API here
-//        // This is just a simulation
-//        List<CryptoCurrencyEntity> allCryptos = cryptoRepo.findAll();
-//        for (CryptoCurrencyEntity crypto : allCryptos) {
-//            BigDecimal currentPrice = crypto.getCurrentPrice();
-//            // Simulate small price changes
-//            double change = (Math.random() * 0.02) - 0.01; // -1% to +1%
-//            BigDecimal newPrice = currentPrice.multiply(BigDecimal.ONE.add(BigDecimal.valueOf(change)));
-//            updatePrice(crypto.getSymbol(), newPrice);
-//        }
-//    }
+    @Scheduled(fixedRate = 5000) // Update every 5 seconds
+    public void simulatePriceUpdates() {
+        try {
+            logger.debug("Running scheduled price updates");
+            List<CryptoCurrencyEntity> allCryptos = cryptoRepo.findAll();
+            logger.debug("Found {} cryptocurrencies to update", allCryptos.size());
+            
+            for (CryptoCurrencyEntity crypto : allCryptos) {
+                BigDecimal currentPrice = crypto.getCurrentPrice();
+                // If current price is zero, set a reasonable starting price
+                if (currentPrice.compareTo(BigDecimal.ZERO) == 0) {
+                    currentPrice = new BigDecimal("100.00");
+                }
+                
+                // Simulate small price changes (-1% to +1%)
+                double change = (Math.random() * 0.02) - 0.01;
+                BigDecimal newPrice = currentPrice.multiply(BigDecimal.ONE.add(BigDecimal.valueOf(change)));
+                newPrice = newPrice.setScale(2, java.math.RoundingMode.HALF_UP);
+                
+                logger.debug("Updating {} price from {} to {} ({}% change)", 
+                    crypto.getSymbol(), currentPrice, newPrice, 
+                    String.format("%.2f", change * 100));
+                
+                updatePrice(crypto.getSymbol(), newPrice);
+            }
+        } catch (Exception e) {
+            logger.error("Error in simulatePriceUpdates: {}", e.getMessage(), e);
+        }
+    }
 
     // Helper method to insert a single cryptocurrency with error handling
     private void insertCrypto(String symbol, String name, String pair, double price) {
