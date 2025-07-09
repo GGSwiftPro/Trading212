@@ -21,18 +21,23 @@ import java.time.Instant;
 @Service
 public class CryptoService {
     
-    @Autowired
-    public CryptoService(CryptoRepository cryptoRepo, SimpMessagingTemplate messagingTemplate, JdbcTemplate jdbcTemplate) {
-        this.cryptoRepo = cryptoRepo;
-        this.messagingTemplate = messagingTemplate;
-        this.jdbcTemplate = jdbcTemplate;
-    }
-
     private static final Logger logger = LoggerFactory.getLogger(CryptoService.class);
     private final CryptoRepository cryptoRepo;
     private final SimpMessagingTemplate messagingTemplate;
     private final Map<String, BigDecimal> lastPrices = new HashMap<>();
     private final JdbcTemplate jdbcTemplate;
+    private final MarketDataService marketDataService;
+
+    @Autowired
+    public CryptoService(CryptoRepository cryptoRepo, 
+                        SimpMessagingTemplate messagingTemplate, 
+                        JdbcTemplate jdbcTemplate,
+                        MarketDataService marketDataService) {
+        this.cryptoRepo = cryptoRepo;
+        this.messagingTemplate = messagingTemplate;
+        this.jdbcTemplate = jdbcTemplate;
+        this.marketDataService = marketDataService;
+    }
 
     @PostConstruct
     public void init() {
@@ -149,7 +154,20 @@ public class CryptoService {
     }
 
     public List<CryptoCurrencyEntity> getAllCryptocurrencies() {
-        return cryptoRepo.findAll();
+        List<CryptoCurrencyEntity> cryptos = cryptoRepo.findAll();
+        
+        // Get market ranks for all cryptocurrencies
+        Map<String, Integer> marketRanks = marketDataService.getMarketRanks();
+        
+        // Set market ranks
+        for (CryptoCurrencyEntity crypto : cryptos) {
+            Integer rank = marketRanks.get(crypto.getSymbol());
+            if (rank != null) {
+                crypto.setMarketRank(rank);
+            }
+        }
+        
+        return cryptos;
     }
     
     public Map<String, Object> getDatabaseInfo() {

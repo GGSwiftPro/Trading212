@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account - Trading212</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        /* Notification animations */
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        .notification-container {
+            pointer-events: none;
+        }
+        
+        .notification-container .alert {
+            pointer-events: auto;
+            animation: slideInRight 0.3s ease-out;
+            margin-bottom: 1rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+        
+        .notification-container .alert.fade-out {
+            animation: fadeOut 0.3s ease-out;
+        }
+        
+        /* Button loading state */
+        .btn-loading {
+            position: relative;
+            pointer-events: none;
+        }
+        
+        .btn-loading .spinner-border {
+            margin-right: 0.5rem;
+        }
+        
+        /* Account card styles */
+        .account-card {
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .account-card:hover {
+            transform: translateY(-5px);
+        }
+        .balance-display {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #0d6efd;
+        }
+        .transaction-card {
+            border-left: 4px solid #0d6efd;
+        }
+        .nav-link {
+            color: #495057;
+            font-weight: 500;
+        }
+        .nav-link.active {
+            color: #0d6efd;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Notification Container -->
+    <div class="notification-container position-fixed top-0 end-0 p-3" style="z-index: 1100; max-width: 350px;">
+        <!-- Notifications will be inserted here -->
+    </div>
+
+    <div class="container py-5">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="display-5 fw-bold">My Account</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Account</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 account-card">
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <i class="bi bi-person-circle" style="font-size: 4rem; color: #0d6efd;"></i>
+                        </div>
+                        <h3 id="username" class="card-title mb-3">Loading...</h3>
+                        <p class="text-muted mb-0">Account ID: <span id="accountId">-</span></p>
+                        <p class="text-muted">Member since: <span id="memberSince">-</span></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-8">
+                <div class="card h-100 account-card">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">Balance</h4>
+                        <div class="d-flex align-items-center justify-content-between mb-4">
+                            <div>
+                                <p class="text-muted mb-1">Available Balance</p>
+                                <div class="balance-display" id="balance">$0.00</div>
+                            </div>
+                            <div class="text-end">
+                                <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#depositModal">
+                                    <i class="bi bi-plus-lg"></i> Deposit
+                                </button>
+                                <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#withdrawModal">
+                                    <i class="bi bi-dash-lg"></i> Withdraw
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h5 class="mb-3">Quick Actions</h5>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-outline-secondary" onclick="resetAccount()">
+                                    <i class="bi bi-arrow-counterclockwise"></i> Reset Account
+                                </button>
+                                <a href="index.html" class="btn btn-outline-primary">
+                                    <i class="bi bi-graph-up"></i> View Market
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card account-card">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">Recent Transactions</h4>
+                        <div id="transactionsContainer">
+                            <div class="text-center py-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2">Loading transactions...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deposit Modal -->
+    <div class="modal fade" id="depositModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Deposit Funds</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="depositAmount" class="form-label">Amount (USD)</label>
+                        <input type="number" class="form-control" id="depositAmount" min="1" step="0.01" placeholder="Enter amount">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="depositFunds()">Deposit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdraw Modal -->
+    <div class="modal fade" id="withdrawModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Withdraw Funds</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="withdrawAmount" class="form-label">Amount (USD)</label>
+                        <input type="number" class="form-control" id="withdrawAmount" min="1" step="0.01" placeholder="Enter amount">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="withdrawFunds()">Withdraw</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variable to store current user data
+        let currentUser = null;
+
+        // Format date to readable string
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+
+        // Format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(amount);
+        }
+
+        // Load user account data
+        async function loadAccountData() {
+            try {
+                // For now, we'll use the default user
+                const response = await fetch('/api/users/current');
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || 'Failed to load account data');
+                }
+                
+                const userData = await response.json();
+                
+                if (!userData) {
+                    throw new Error('No user data received');
+                }
+                
+                currentUser = userData;
+                
+                // Update UI with user data
+                document.getElementById('username').textContent = currentUser.username || 'User';
+                document.getElementById('accountId').textContent = `#${currentUser.id || 'N/A'}`;
+                
+                // Format the last updated date or use current date if not available
+                const lastUpdated = currentUser.lastUpdated ? 
+                    new Date(currentUser.lastUpdated) : new Date();
+                document.getElementById('lastUpdated').textContent = formatDate(lastUpdated.toISOString());
+                document.getElementById('memberSince').textContent = formatDate(lastUpdated.toISOString());
+                
+                // Format balance with 2 decimal places
+                const balance = currentUser.balance ? 
+                    parseFloat(currentUser.balance).toFixed(2) : '0.00';
+                document.getElementById('balance').textContent = formatCurrency(balance);
+                
+                // Load transactions
+                await loadTransactions();
+                
+            } catch (error) {
+                console.error('Error loading account data:', error);
+                
+                // Show error in the UI
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'alert alert-danger';
+                errorDiv.innerHTML = `
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    ${error.message || 'Failed to load account data. Please try again later.'}
+                `;
+                
+                const container = document.querySelector('.account-container');
+                if (container) {
+                    container.prepend(errorDiv);
+                    
+                    // Remove the error message after 5 seconds
+                    setTimeout(() => {
+                        errorDiv.remove();
+                    }, 5000);
+                }
+                
+                // Set default values in case of error
+                document.getElementById('username').textContent = 'User';
+                document.getElementById('accountId').textContent = '#N/A';
+                const now = new Date().toISOString();
+                document.getElementById('memberSince').textContent = formatDate(now);
+                document.getElementById('lastUpdated').textContent = formatDate(now);
+                document.getElementById('balance').textContent = formatCurrency('0.00');
+            }
+        }
+
+        // Load user transactions
+        async function loadTransactions() {
+            try {
+                // For now, we'll show a message since we don't have transaction history yet
+                const transactionsContainer = document.getElementById('transactionsContainer');
+                transactionsContainer.innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        Your transaction history will appear here.
+                    </div>
+                `;
+                
+                // TODO: Implement actual transaction history when the backend is ready
+                // const response = await fetch(`/api/transactions?userId=${currentUser.id}`);
+                // const transactions = await response.json();
+                // renderTransactions(transactions);
+                
+            } catch (error) {
+                console.error('Error loading transactions:', error);
+                document.getElementById('transactionsContainer').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        Failed to load transactions. Please try again later.
+                    </div>
+                `;
+            }
+        }
+
+        // Show notification function
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} alert-dismissible fade show`;
+            notification.role = 'alert';
+            notification.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <i class="bi ${type === 'success' ? 'bi-check-circle-fill' : 
+                                      type === 'danger' ? 'bi-exclamation-triangle-fill' : 
+                                      type === 'warning' ? 'bi-exclamation-circle-fill' : 
+                                      'bi-info-circle-fill'} me-2"></i>
+                    <div>${message}</div>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+            
+            const container = document.querySelector('.notification-container');
+            if (container) {
+                container.appendChild(notification);
+                
+                // Auto-remove after 5 seconds
+                const removeNotification = () => {
+                    notification.classList.add('fade-out');
+                    setTimeout(() => notification.remove(), 300);
+                };
+                
+                const removeTimeout = setTimeout(removeNotification, 5000);
+                
+                // Remove notification when close button is clicked
+                const closeBtn = notification.querySelector('.btn-close');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        clearTimeout(removeTimeout);
+                        removeNotification();
+                    });
+                }
+                
+                // Remove notification when clicked anywhere
+                notification.addEventListener('click', (e) => {
+                    if (e.target === notification) {
+                        clearTimeout(removeTimeout);
+                        removeNotification();
+                    }
+                });
+            }
+            
+            return notification;
+        }
+        
+        // Deposit funds
+        async function depositFunds() {
+            const amountInput = document.getElementById('depositAmount');
+            const amount = parseFloat(amountInput.value);
+            
+            if (isNaN(amount) || amount <= 0) {
+                showNotification('Please enter a valid amount', 'warning');
+                return;
+            }
+
+            try {
+                // Show loading state
+                const depositBtn = document.querySelector('#depositModal .btn-primary');
+                const originalBtnText = depositBtn.innerHTML;
+                depositBtn.disabled = true;
+                depositBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Processing...';
+                
+                const response = await fetch(`/api/users/${currentUser.id}/deposit?amount=${amount}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.error || 'Deposit failed');
+                }
+                
+                // Update balance display
+                document.getElementById('balance').textContent = formatCurrency(result.balance);
+                
+                // Close modal
+                const modalEl = document.getElementById('depositModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                modal.hide();
+                
+                // Reset input
+                amountInput.value = '';
+                
+                // Show success message
+                showNotification('Deposit successful!', 'success');
+                
+                // Reload account data to ensure everything is in sync
+                await loadAccountData();
+                
+            } catch (error) {
+                console.error('Error depositing funds:', error);
+                showNotification(`Deposit failed: ${error.message || 'Please try again later'}`, 'danger');
+            } finally {
+                // Reset button state
+                const depositBtn = document.querySelector('#depositModal .btn-primary');
+                if (depositBtn) {
+                    depositBtn.disabled = false;
+                    depositBtn.innerHTML = 'Deposit';
+                }
+            }
+        }
+
+        // Withdraw funds
+        async function withdrawFunds() {
+            const amountInput = document.getElementById('withdrawAmount');
+            const amount = parseFloat(amountInput.value);
+            
+            if (isNaN(amount) || amount <= 0) {
+                showNotification('Please enter a valid amount', 'warning');
+                return;
+            }
+
+            try {
+                // Show loading state
+                const withdrawBtn = document.querySelector('#withdrawModal .btn-primary');
+                const originalBtnText = withdrawBtn.innerHTML;
+                withdrawBtn.disabled = true;
+                withdrawBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Processing...';
+                
+                const response = await fetch(`/api/users/${currentUser.id}/withdraw?amount=${amount}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.error || 'Withdrawal failed');
+                }
+                
+                // Update balance display
+                document.getElementById('balance').textContent = formatCurrency(result.balance);
+                
+                // Close modal
+                const modalEl = document.getElementById('withdrawModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                modal.hide();
+                
+                // Reset input
+                amountInput.value = '';
+                
+                // Show success message
+                showNotification('Withdrawal successful!', 'success');
+                
+                // Reload account data to ensure everything is in sync
+                await loadAccountData();
+                
+            } catch (error) {
+                console.error('Error withdrawing funds:', error);
+                showNotification(`Withdrawal failed: ${error.message || 'Please try again later'}`, 'danger');
+            } finally {
+                // Reset button state
+                const withdrawBtn = document.querySelector('#withdrawModal .btn-primary');
+                if (withdrawBtn) {
+                    withdrawBtn.disabled = false;
+                    withdrawBtn.innerHTML = 'Withdraw';
+                }
+            }
+        }
+
+        // Reset account (demo purposes)
+        async function resetAccount() {
+            if (!confirm('Are you sure you want to reset your account? This will set your balance back to $10,000.')) {
+                return;
+            }
+
+            try {
+                // Show loading state
+                const resetBtn = document.querySelector('button[onclick="resetAccount()"]');
+                const originalBtnText = resetBtn.innerHTML;
+                resetBtn.disabled = true;
+                resetBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Resetting...';
+                
+                const response = await fetch(`/api/users/${currentUser.id}/reset`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.error || 'Failed to reset account');
+                }
+                
+                // Show success message
+                showNotification('Account reset successfully!', 'success');
+                
+                // Reload account data to reflect changes
+                await loadAccountData();
+                
+            } catch (error) {
+                console.error('Error resetting account:', error);
+                showNotification(`Failed to reset account: ${error.message || 'Please try again later'}`, 'danger');
+            } finally {
+                // Reset button state
+                const resetBtn = document.querySelector('button[onclick="resetAccount()"]');
+                if (resetBtn) {
+                    resetBtn.disabled = false;
+                    resetBtn.innerHTML = '<i class="bi bi-arrow-counterclockwise"></i> Reset Account';
+                }
+            }
+        }
+
+        // Initialize the page when loaded
+        document.addEventListener('DOMContentLoaded', loadAccountData);
+    </script>
+</body>
+</html>

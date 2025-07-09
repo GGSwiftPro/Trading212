@@ -11,6 +11,7 @@ public class CryptoCurrencyEntity {
     private String krakenPairName;
     private BigDecimal currentPrice;
     private LocalDateTime lastUpdated;
+    private Integer marketRank;
 
     // No-argument constructor
     public CryptoCurrencyEntity() {
@@ -70,5 +71,13 @@ public class CryptoCurrencyEntity {
 
     public void setLastUpdated(LocalDateTime lastUpdated) {
         this.lastUpdated = lastUpdated;
+    }
+
+    public Integer getMarketRank() {
+        return marketRank;
+    }
+
+    public void setMarketRank(Integer marketRank) {
+        this.marketRank = marketRank;
     }
 }

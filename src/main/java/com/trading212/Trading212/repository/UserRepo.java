@@ -70,29 +70,32 @@ public class UserRepo {
 
     public Optional<UserEntity> findByUsername(String username) {
         try {
-            List<UserEntity> users = jdbcTemplate.query(
-                "SELECT id, username, balance, last_updated FROM users WHERE username = ?", 
-                new UserRowMapper(), 
-                username
+            UserEntity user = jdbcTemplate.queryForObject(
+                "SELECT * FROM users WHERE username = ?",
+                new Object[]{username},
+                new UserRowMapper()
             );
-            return users.stream().findFirst();
+            return Optional.ofNullable(user);
         } catch (Exception e) {
             return Optional.empty();
         }
     }
-
+    
     public List<UserEntity> findAll() {
         return jdbcTemplate.query(
-            "SELECT id, username, balance, last_updated FROM users", 
+            "SELECT * FROM users ORDER BY username",
             new UserRowMapper()
         );
     }
 
     public void updateBalance(Long userId, BigDecimal newBalance) {
-        jdbcTemplate.update(
-            "UPDATE users SET balance = ?, last_updated = CURRENT_TIMESTAMP WHERE id = ?",
+        int updated = jdbcTemplate.update(
+            "UPDATE users SET balance = ? WHERE id = ?",
             newBalance, userId
         );
+        if (updated == 0) {
+            throw new RuntimeException("Failed to update user balance. User not found with id: " + userId);
+        }
     }
 
     public void resetBalance(Long userId) {

@@ -220,6 +220,23 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="#">Crypto Trading Platform</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="index.html">
+                            <i class="bi bi-graph-up"></i> Market
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="account.html">
+                            <i class="bi bi-person-circle"></i> My Account
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
     
@@ -1724,6 +1741,13 @@ function updateCryptoCard(update) {
             return;
         }
         
+        // Update market rank if available
+        const rankElement = card.querySelector('.market-rank');
+        if (rankElement && update.marketRank !== undefined) {
+            rankElement.textContent = `#${update.marketRank}`;
+            rankElement.style.display = 'inline-block';
+        }
+        
         // Update price with animation
         const priceElement = card.querySelector('.card-price');
         if (priceElement) {
@@ -1825,7 +1849,7 @@ function updateCryptoCard(update) {
 async function fetchCryptoData() {
     try {
         console.log('Fetching initial crypto data...');
-        const response = await fetch('http://localhost:8091/api/crypto');
+        const response = await fetch('http://localhost:8080/api/crypto');
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -1899,13 +1923,16 @@ function updateCryptoList(cryptoList) {
             <div class="card h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="card-title mb-0">
-                            <span class="crypto-icon me-2" style="display: inline-block; width: 24px; text-align: center;">
-                                ${getCryptoIcon(crypto.symbol)}
-                            </span>
-                            ${crypto.name} (${crypto.symbol})
-                        </h5>
-                        <span class="badge bg-primary">#${crypto.id || 'N/A'}</span>
+                        <div>
+                            <h5 class="card-title mb-0">
+                                <span class="crypto-icon me-2" style="display: inline-block; width: 24px; text-align: center;">
+                                    ${getCryptoIcon(crypto.symbol)}
+                                </span>
+                                ${crypto.name} (${crypto.symbol})
+                                ${crypto.marketRank ? `<span class="market-rank badge bg-secondary ms-2">#${crypto.marketRank}</span>` : ''}
+                            </h5>
+                        </div>
+                        <span class="badge bg-primary">${crypto.symbol}</span>
                     </div>
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
