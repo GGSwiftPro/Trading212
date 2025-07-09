@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction History - Crypto Trading Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        .connection-status {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            vertical-align: middle;
+            transition: all 0.3s ease;
+        }
+        .connected {
+            background-color: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+        }
+        .disconnected {
+            background-color: #dc3545;
+            animation: pulse 2s infinite;
+        }
+        .connecting {
+            background-color: #ffc107;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+        /* Optional: Style for transaction details modal */
+        #transactionDetailsModal .modal-body pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#">Crypto Trading Platform</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">Market</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="history.html">Transaction History</a>
+                </li>
+            </ul>
+            <div class="d-flex align-items-center">
+                <div id="connectionStatus" class="status-indicator me-2">
+                    <span class="connection-status connecting" id="connectionIndicator"></span>
+                    <span id="connectionText" class="text-light">Connecting...</span>
+                    <span id="connectionTime" class="ms-2 text-muted small"></span>
+                </div>
+                <div class="btn-group ms-2" role="group">
+                    <button id="reconnectBtn" class="btn btn-outline-light btn-sm" title="Reconnect">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                    <button class="btn btn-outline-light btn-sm" onclick="location.reload()" title="Refresh Page">
+                        <i class="bi bi-arrow-repeat"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container my-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Transaction History</h5>
+                    <div>
+                        <select class="form-select form-select-sm d-inline-block w-auto me-2" id="pageSizeSelect">
+                            <option value="5">5 per page</option>
+                            <option value="10" selected>10 per page</option>
+                            <option value="25">25 per page</option>
+                            <option value="50">50 per page</option>
+                        </select>
+                        <button class="btn btn-sm btn-outline-secondary" id="refreshHistoryBtn">
+                            <i class="bi bi-arrow-clockwise"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Date/Time</th>
+                                <th>Type</th>
+                                <th>Symbol</th>
+                                <th>Amount</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                            </tr>
+                            </thead>
+                            <tbody id="transactionHistoryBody">
+                            <tr>
+                                <td colspan="7" class="text-center py-4">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p class="mt-2">Loading transaction data...</p>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center p-3 border-top">
+                        <div class="text-muted small" id="paginationInfo">Loading...</div>
+                        <nav aria-label="Transaction history navigation">
+                            <ul class="pagination pagination-sm mb-0" id="paginationNav">
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="transactionDetailsModal" tabindex="-1" aria-labelledby="transactionDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="transactionDetailsModalLabel">Transaction Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Transaction ID:</dt>
+                    <dd class="col-sm-8" id="detailId"></dd>
+
+                    <dt class="col-sm-4">Date/Time:</dt>
+                    <dd class="col-sm-8" id="detailDateTime"></dd>
+
+                    <dt class="col-sm-4">Type:</dt>
+                    <dd class="col-sm-8" id="detailType"></dd>
+
+                    <dt class="col-sm-4">Symbol:</dt>
+                    <dd class="col-sm-8" id="detailSymbol"></dd>
+
+                    <dt class="col-sm-4">Amount:</dt>
+                    <dd class="col-sm-8" id="detailAmount"></dd>
+
+                    <dt class="col-sm-4">Price:</dt>
+                    <dd class="col-sm-8" id="detailPrice"></dd>
+
+                    <dt class="col-sm-4">Total:</dt>
+                    <dd class="col-sm-8" id="detailTotal"></dd>
+
+                    <dt class="col-sm-4">Status:</dt>
+                    <dd class="col-sm-8" id="detailStatus"></dd>
+
+                    <dt class="col-sm-4">Notes:</dt>
+                    <dd class="col-sm-8" id="detailNotes">N/A</dd>
+                </dl>
+                <hr>
+                <h6>Raw Data:</h6>
+                <pre id="detailRawData"></pre>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@6.1.2/bundles/stomp.umd.min.js"></script>
+
+<script>
+    // Global error handler for unhandled exceptions
+    window.onerror = function(message, source, lineno, colno, error) {
+        console.error('Global error:', { message, source, lineno, colno, error });
+        return false; // Let the default handler run too
+    };
+
+    // Unhandled promise rejection handler
+    window.addEventListener('unhandledrejection', function(event) {
+        console.error('Unhandled promise rejection:', event.reason);
+    });
+
+    console.log('[History] Script loaded and executing');
+
+    // Global WebSocket client instance (declared outside to be truly global to this script)
+    let webSocketClient;
+
+    console.log('[History] Global variables initialized');
+
+    // WebSocket configuration
+    const WS_CONFIG = {
+        debug: false, // Set to true to enable detailed STOMP.js console logs
+        reconnectDelay: 1000, // Start with 1 second
+        maxReconnectDelay: 30000, // Max 30 seconds
+        maxReconnectAttempts: 50, // Max number of reconnect attempts before giving up
+        connectionTimeout: 10000, // 10 seconds connection timeout for initial connect
+        pingInterval: 10000, // 10 seconds between PING messages from client
+        pongTimeout: 10000 // 10 seconds to wait for PONG before considering connection dead
+    };
+
+    // Utility functions
+    function formatPrice(price) {
+        if (price === undefined || price === null) return 'N/A';
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 8
+        }).format(price);
+    }
+
+    function updateConnectionStatus(connected, message, { latency } = {}) {
+        const statusIndicator = document.getElementById('connectionIndicator');
+        const statusText = document.getElementById('connectionText');
+        const connectionTime = document.getElementById('connectionTime');
+        const reconnectBtn = document.getElementById('reconnectBtn');
+
+        if (!statusIndicator || !statusText || !connectionTime || !reconnectBtn) return;
+
+        if (connected) {
+            statusIndicator.className = 'connection-status connected';
+            statusText.textContent = 'Connected';
+            if (latency !== undefined) {
+                statusText.textContent += ` (${latency}ms)`;
+            }
+            reconnectBtn.disabled = true;
+            reconnectBtn.title = 'Connected';
+            reconnectBtn.innerHTML = '<i class="bi bi-check-circle"></i>';
+        } else {
+            statusIndicator.className = 'connection-status disconnected';
+            statusText.textContent = message || 'Disconnected';
+            reconnectBtn.disabled = false;
+            reconnectBtn.title = 'Reconnect';
+            reconnectBtn.innerHTML = '<i class="bi bi-arrow-clockwise"></i>';
+        }
+        connectionTime.textContent = new Date().toLocaleTimeString();
+    }
+
+    // WebSocketClient Class for handling WebSocket connections
+    class WebSocketClient {
+        constructor() {
+            this.stompClient = null;
+            this.connected = false;
+            this.subscriptions = new Map();
+            this.reconnectAttempts = 0;
+            this.reconnectTimer = null;
+            this.pingTimer = null;
+            this.lastPongTime = Date.now();
+            this.isExplicitDisconnect = false;
+            this.connectTimeoutId = null;
+
+            this.onConnectCallback = null;
+            this.onDisconnectCallback = null;
+            this.onErrorCallback = null;
+        }
+
+        set onConnect(callback) { this.onConnectCallback = callback; }
+        set onDisconnect(callback) { this.onDisconnectCallback = callback; }
+        set onError(callback) { this.onErrorCallback = callback; }
+
+        notifyConnectionCallbacks(frame) {
+            console.log('[WebSocket] Notifying connection callbacks');
+            if (this.onConnectCallback) {
+                this.onConnectCallback(frame);
+            }
+        }
+
+        notifyDisconnectionCallbacks() {
+            console.log('[WebSocket] Notifying disconnection callbacks');
+            if (this.onDisconnectCallback) {
+                this.onDisconnectCallback();
+            }
+        }
+
+        async connect() {
+            console.log('[WebSocketClient] connect() method called.'); // ADDED LOG
+            if (this.connected) {
+                console.log('[WebSocket] Already connected.');
+                this.notifyConnectionCallbacks();
+                return Promise.resolve();
+            }
+
+            this.isExplicitDisconnect = false;
+            console.log('[WebSocket] Attempting to connect...');
+            updateConnectionStatus(false, 'Connecting...');
+
+            if (this.stompClient && this.stompClient.connected) {
+                try {
+                    console.log('[WebSocket] Disconnecting existing STOMP client...');
+                    this.stompClient.disconnect(() => { /* callback */ });
+                } catch (error) {
+                    console.warn('[WebSocket] Error during existing STOMP client disconnect:', error);
+                }
+                this.stompClient = null;
+            }
+
+            return new Promise((resolve, reject) => {
+                try {
+                    this._initiateStompConnection(resolve, reject);
+                } catch (error) {
+                    console.error('[WebSocket] Error initializing connection:', error);
+                    this.handleDisconnect(error, reject);
+                }
+            });
+        }
+
+        _initiateStompConnection(resolve, reject) {
+            try {
+                console.log('[WebSocket] Creating new SockJS connection...');
+
+                if (this.connectTimeoutId) {
+                    clearTimeout(this.connectTimeoutId);
+                    this.connectTimeoutId = null;
+                }
+
+                this.connectTimeoutId = setTimeout(() => {
+                    if (!this.connected) {
+                        const error = new Error('Connection timeout - server did not respond in time');
+                        console.error('[WebSocket] Connection timeout');
+                        this.handleDisconnect(error, reject);
+                    }
+                }, WS_CONFIG.connectionTimeout);
+
+                const socket = new SockJS('/ws');
+
+                // Check if StompJs is defined and has Client property
+                if (typeof StompJs === 'undefined' || typeof StompJs.Client === 'undefined') {
+                    // Fallback for older UMD bundles that might expose 'Stomp' globally
+                    if (typeof Stomp !== 'undefined' && typeof Stomp.over === 'function') {
+                        console.warn("Using Stomp.over as StompJs.Client is not available. Please update @stomp/stompjs library if possible.");
+                        this.stompClient = Stomp.over(socket);
+                    } else {
+                        throw new Error("STOMP.js library not loaded correctly or 'StompJs.Client'/'Stomp.over' is undefined.");
+                    }
+                } else {
+                    // Correct usage for @stomp/stompjs v5+
+                    this.stompClient = new StompJs.Client({
+                        webSocketFactory: () => socket,
+                        heartbeatIncoming: WS_CONFIG.pingInterval,
+                        heartbeatOutgoing: WS_CONFIG.pingInterval,
+                        debug: WS_CONFIG.debug ? (str) => {
+                            if (str &&
+                                !str.includes('>>> PING') &&
+                                !str.includes('<<< PONG') &&
+                                !str.includes('Received a heartbeat') &&
+                                !str.includes('Sending a heartbeat') &&
+                                str.trim() !== '') {
+                                console.log(`[STOMP Debug] ${str}`);
+                            }
+                        } : () => {},
+                        reconnectDelay: 0,
+                    });
+                }
+
+                const headers = {};
+                const authToken = localStorage.getItem('authToken');
+                if (authToken) {
+                    headers['Authorization'] = `Bearer ${authToken}`;
+                }
+
+                // Attach event handlers
+                this.stompClient.onConnect = (frame) => {
+                    console.log('[WebSocket] Connected:', frame);
+                    if (this.connectTimeoutId) {
+                        clearTimeout(this.connectTimeoutId);
+                        this.connectTimeoutId = null;
+                    }
+                    this.connected = true;
+                    this.reconnectAttempts = 0;
+                    this.lastPongTime = Date.now();
+                    this.notifyConnectionCallbacks(frame);
+                    resolve(frame);
+
+                    this.subscribe('/user/queue/ping', (message) => {
+                        try {
+                            const pongData = message.body ? JSON.parse(message.body) : {};
+                            console.debug('[Pong] Received pong:', pongData);
+                            this.handlePong(pongData);
+                        } catch (e) {
+                            console.error('Error processing pong message:', e);
+                        }
+                    });
+                    this.startPingInterval();
+                    fetchTransactionHistory().catch(error => {
+                        console.error('Error fetching transaction history after connect:', error);
+                    });
+                };
+
+                this.stompClient.onStompError = (frame) => {
+                    if (this.connectTimeoutId) {
+                        clearTimeout(this.connectTimeoutId);
+                        this.connectTimeoutId = null;
+                    }
+                    const error = new Error(`STOMP error: ${frame.headers.message || 'Unknown error'}`);
+                    console.error('[WebSocket] STOMP error handler:', frame);
+                    this.handleDisconnect(error, reject);
+                };
+
+                this.stompClient.onWebSocketClose = (event) => {
+                    console.warn('[WebSocket] WebSocket closed:', event.code, event.reason);
+                    if (!this.isExplicitDisconnect) {
+                        this.handleDisconnect(new Error(`WebSocket closed: ${event.code} ${event.reason}`));
+                    }
+                };
+
+                this.stompClient.onWebSocketError = (event) => {
+                    console.error('[WebSocket] WebSocket error:', event);
+                    if (!this.isExplicitDisconnect) {
+                        this.handleDisconnect(new Error(`WebSocket error: ${event.message || 'Unknown'}`));
+                    }
+                };
+
+                // Activate the client (this initiates the connection)
+                this.stompClient.activate();
+
+            } catch (e) {
+                console.error('[WebSocket] Error setting up SockJS/STOMP:', e);
+                this.handleDisconnect(e, reject);
+            }
+        }
+
+        startPingInterval() {
+            this.stopPingInterval();
+            this.pingTimer = setInterval(() => {
+                if (this.connected) {
+                    const now = Date.now();
+                    const timeSinceLastPong = now - this.lastPongTime;
+
+                    if (timeSinceLastPong > (WS_CONFIG.pingInterval + WS_CONFIG.pongTimeout)) {
+                        console.warn('[WebSocket] No pong received within timeout. Forcing disconnect.');
+                        this.handleDisconnect(new Error('No pong received from server within timeout.'));
+                        return;
+                    }
+                    this.sendPing();
+                }
+            }, WS_CONFIG.pingInterval);
+            console.log(`[WebSocket] Ping interval started (every ${WS_CONFIG.pingInterval / 1000}s).`);
+        }
+
+        stopPingInterval() {
+            if (this.pingTimer) {
+                clearInterval(this.pingTimer);
+                this.pingTimer = null;
+                console.log('[WebSocket] Ping interval stopped.');
+            }
+        }
+
+        sendPing() {
+            if (!this.connected || !this.stompClient || !this.stompClient.active) { // Use .active for StompJs.Client
+                console.warn('[WebSocket] Cannot send ping - not connected or client not active.');
+                return;
+            }
+            try {
+                const pingData = { timestamp: Date.now(), clientTime: new Date().toISOString() };
+                // For StompJs.Client, use .publish() method
+                this.stompClient.publish({destination: '/app/ping', headers: {}, body: JSON.stringify(pingData)});
+                console.debug('[Ping] Sent ping to /app/ping.');
+            } catch (e) {
+                console.error('[Ping] Error sending ping:', e);
+            }
+        }
+
+        handlePong(pongData) {
+            this.lastPongTime = Date.now();
+            if (pongData.timestamp) {
+                const rtt = Date.now() - pongData.timestamp;
+                console.debug(`[Pong] Round-trip time: ${rtt}ms`);
+                updateConnectionStatus(true, 'Connected', { latency: rtt });
+            } else {
+                updateConnectionStatus(true, 'Connected');
+            }
+        }
+
+        handleDisconnect(error, rejectPromise = null) {
+            if (!this.connected && !this.reconnectTimer && !error && !this.isExplicitDisconnect) {
+                return;
+            }
+
+            console.log('[WebSocket] Handling disconnection...');
+            this.connected = false;
+            this.stopPingInterval();
+
+            if (this.connectTimeoutId) {
+                clearTimeout(this.connectTimeoutId);
+                this.connectTimeoutId = null;
+            }
+
+            this.subscriptions.forEach((subscription, destination) => {
+                try {
+                    if (subscription && typeof subscription.unsubscribe === 'function') {
+                        subscription.unsubscribe();
+                        console.log(`[WebSocket] Unsubscribed from ${destination}`);
+                    }
+                } catch (e) {
+                    console.error(`Error unsubscribing from ${destination}:`, e);
+                }
+            });
+            this.subscriptions.clear();
+
+            if (this.stompClient && this.stompClient.active) {
+                try {
+                    console.log('[WebSocket] Deactivating STOMP client...');
+                    this.stompClient.deactivate().then(() => {
+                        console.log('[WebSocket] Successfully deactivated STOMP client.');
+                        this.connected = false;
+                        this.notifyDisconnectionCallbacks();
+                    }).catch(e => {
+                        console.warn('Error during STOMP client deactivation:', e);
+                        this.connected = false;
+                        this.notifyDisconnectionCallbacks();
+                    });
+                } catch (e) {
+                    console.error('[WebSocket] Error during disconnection:', e);
+                    this.connected = false;
+                    this.notifyDisconnectionCallbacks();
+                }
+            } else {
+                console.log('[WebSocket] No active STOMP client instance to disconnect');
+                this.connected = false;
+                this.notifyDisconnectionCallbacks();
+            }
+            this.stompClient = null;
+        }
+
+        scheduleReconnect() {
+            if (this.isExplicitDisconnect) {
+                return;
+            }
+            if (this.reconnectAttempts >= WS_CONFIG.maxReconnectAttempts) {
+                console.error('Max reconnection attempts reached. Giving up.');
+                updateConnectionStatus(false, 'Connection lost. Please refresh.');
+                this.onErrorCallback && this.onErrorCallback(new Error('Max reconnect attempts reached.'));
+                return;
+            }
+
+            const delay = Math.min(
+                WS_CONFIG.reconnectDelay * Math.pow(2, this.reconnectAttempts),
+                WS_CONFIG.maxReconnectDelay
+            );
+            const jitter = Math.random() * 500;
+            const totalDelay = Math.floor(delay + jitter);
+
+            this.reconnectAttempts++;
+            console.log(`[WebSocket] Scheduling reconnect attempt #${this.reconnectAttempts} in ${Math.round(totalDelay/1000)}s.`);
+            updateConnectionStatus(false, `Reconnecting in ${Math.round(totalDelay/1000)}s...`);
+
+            if (this.reconnectTimer) {
+                clearTimeout(this.reconnectTimer);
+            }
+            this.reconnectTimer = setTimeout(() => this.connect(), totalDelay);
+        }
+
+        subscribe(destination, callback) {
+            if (!this.stompClient || !this.stompClient.active) {
+                console.error(`[WebSocket] Cannot subscribe to ${destination}: Not connected or client not active.`);
+                return null;
+            }
+            if (this.subscriptions.has(destination)) {
+                console.warn(`[WebSocket] Already subscribed to ${destination}.`);
+                return this.subscriptions.get(destination);
+            }
+
+            console.log(`[WebSocket] Subscribing to ${destination}.`);
+            try {
+                const subscription = this.stompClient.subscribe(destination, (message) => {
+                    try {
+                        const data = message.body ? JSON.parse(message.body) : {};
+                        callback({ body: data, headers: message.headers });
+                    } catch (e) {
+                        console.error(`[WebSocket] Error processing message from ${destination}:`, e, message.body);
+                        callback({ body: message.body, headers: message.headers, error: e });
+                    }
+                });
+                this.subscriptions.set(destination, subscription);
+                return subscription;
+            } catch (e) {
+                console.error(`[WebSocket] Error subscribing to ${destination}:`, e);
+                return null;
+            }
+        }
+
+        send(destination, body = {}, headers = {}) {
+            if (!this.stompClient || !this.stompClient.active) {
+                console.error(`[WebSocket] Cannot send message to ${destination}: Not connected or client not active.`);
+                return Promise.reject(new Error('Not connected to WebSocket server.'));
+            }
+
+            return new Promise((resolve, reject) => {
+                try {
+                    const payload = typeof body === 'string' ? body : JSON.stringify(body);
+                    const messageHeaders = {
+                        ...headers,
+                        'content-type': 'application/json'
+                    };
+
+                    console.log(`[WebSocket] Sending message to ${destination}:`, body);
+
+                    if (headers.receipt) {
+                        const receiptId = headers.receipt;
+                        const receiptSubscription = this.stompClient.subscribe(`/user/queue/receipts/${receiptId}`, (receiptMessage) => {
+                            clearTimeout(timeoutId);
+                            receiptSubscription.unsubscribe();
+                            try {
+                                const receipt = {
+                                    headers: receiptMessage.headers,
+                                    body: receiptMessage.body ? JSON.parse(receiptMessage.body) : null
+                                };
+                                console.log(`[WebSocket] Received receipt for message to ${destination} (ID: ${receiptId})`, receipt);
+                                resolve(receipt);
+                            } catch (e) {
+                                console.error(`[WebSocket] Error parsing receipt for ${destination} (ID: ${receiptId}):`, e);
+                                resolve({ headers: receiptMessage.headers, body: receiptMessage.body, error: e });
+                            }
+                        });
+
+                        const timeoutId = setTimeout(() => {
+                            receiptSubscription.unsubscribe();
+                            console.warn(`[WebSocket] Receipt timeout for message to ${destination} (ID: ${receiptId})`);
+                            resolve({
+                                headers: { 'receipt-id': receiptId, 'receipt-status': 'timeout' },
+                                body: { status: 'timeout', message: 'No receipt received within timeout period' }
+                            });
+                        }, 5000);
+                    }
+
+                    this.stompClient.publish({ // Use .publish for StompJs.Client
+                        destination: destination,
+                        headers: messageHeaders,
+                        body: payload
+                    });
+
+                    if (!headers.receipt) {
+                        resolve({ status: 'sent', destination: destination });
+                    }
+
+                } catch (e) {
+                    console.error(`[WebSocket] Error sending message to ${destination}:`, e);
+                    reject(e);
+                }
+            });
+        }
+
+        disconnect() {
+            console.log('[WebSocket] Initiating explicit disconnect.');
+            this.isExplicitDisconnect = true;
+
+            if (this.reconnectTimer) {
+                clearTimeout(this.reconnectTimer);
+            }
+
+            if (this.connectTimeoutId) {
+                clearTimeout(this.connectTimeoutId);
+            }
+
+            this.stopPingInterval();
+
+            this.subscriptions.forEach((subscription, destination) => {
+                try {
+                    if (subscription && typeof subscription.unsubscribe === 'function') {
+                        subscription.unsubscribe();
+                        console.log(`[WebSocket] Unsubscribed from ${destination}`);
+                    }
+                } catch (e) {
+                    console.error(`[WebSocket] Error unsubscribing from ${destination}:`, e);
+                }
+            });
+            this.subscriptions.clear();
+
+            if (this.stompClient && this.stompClient.connected) {
+                try {
+                    console.log('[WebSocket] Disconnecting STOMP client...');
+                    this.stompClient.disconnect(() => {
+                        console.log('[WebSocket] Successfully disconnected STOMP client.');
+                        this.connected = false;
+                        this.notifyDisconnectionCallbacks();
+                    }, { force: true });
+                } catch (e) {
+                    console.error('[WebSocket] Error during disconnection:', e);
+                    this.connected = false;
+                    this.notifyDisconnectionCallbacks();
+                }
+            } else {
+                console.log('[WebSocket] No active STOMP client instance to disconnect');
+                this.connected = false;
+                this.notifyDisconnectionCallbacks();
+            }
+            this.stompClient = null;
+        }
+    }
+
+    // --- Transaction History Specific Logic ---
+    let currentPage = 1;
+    let pageSize = 10;
+    let totalTransactions = 0;
+
+    async function fetchTransactionHistory() {
+        console.log('[fetchTransactionHistory] ===== FUNCTION CALLED =====');
+        console.log('[fetchTransactionHistory] Starting to fetch transaction history');
+        console.trace('[fetchTransactionHistory] Stack trace:');
+        const tbody = document.getElementById('transactionHistoryBody');
+        const paginationNav = document.getElementById('paginationNav');
+        const paginationInfo = document.getElementById('paginationInfo');
+
+        if (!tbody || !paginationNav || !paginationInfo) {
+            console.error('[fetchTransactionHistory] Required DOM elements not found');
+            return;
+        }
+
+        // Show loading state
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>';
+        paginationInfo.textContent = 'Loading...';
+        paginationNav.innerHTML = '';
+
+        console.log('[fetchTransactionHistory] Set loading state in UI');
+
+        const useFallbackData = (error) => {
+            if (error) console.error('[History] Error fetching from API:', error);
+            console.warn('[History] Using fallback transaction data.');
+
+            const fallbackTransactions = [
+                { id: 'tx_001', timestamp: '2025-07-07T10:00:00Z', type: 'BUY', symbol: 'BTC', cryptoName: 'Bitcoin', quantity: 0.05, price: 62000.00, totalAmount: 3100.00, status: 'COMPLETED' },
+                { id: 'tx_002', timestamp: '2025-07-07T10:15:30Z', type: 'SELL', symbol: 'ETH', cryptoName: 'Ethereum', quantity: 1.2, price: 3450.00, totalAmount: 4140.00, status: 'COMPLETED' },
+                { id: 'tx_003', timestamp: '2025-07-07T10:30:15Z', type: 'BUY', symbol: 'XRP', cryptoName: 'Ripple', quantity: 1000, price: 0.50, totalAmount: 500.00, status: 'PENDING' },
+                { id: 'tx_004', timestamp: '2025-07-07T10:45:00Z', type: 'BUY', symbol: 'ADA', cryptoName: 'Cardano', quantity: 500, price: 0.44, totalAmount: 220.00, status: 'COMPLETED' },
+                { id: 'tx_005', timestamp: '2025-07-07T11:00:00Z', type: 'SELL', symbol: 'BTC', cryptoName: 'Bitcoin', quantity: 0.02, price: 63000.00, totalAmount: 1260.00, status: 'COMPLETED' },
+                { id: 'tx_006', timestamp: '2025-07-07T11:15:00Z', type: 'BUY', symbol: 'ETH', cryptoName: 'Ethereum', quantity: 0.5, price: 3500.00, totalAmount: 1750.00, status: 'COMPLETED' },
+                { id: 'tx_007', timestamp: '2025-07-07T11:30:00Z', type: 'BUY', symbol: 'DOGE', cryptoName: 'Dogecoin', quantity: 10000, price: 0.08, totalAmount: 800.00, status: 'COMPLETED' },
+                { id: 'tx_008', timestamp: '2025-07-07T11:45:00Z', type: 'SELL', symbol: 'LTC', cryptoName: 'Litecoin', quantity: 5, price: 70.00, totalAmount: 350.00, status: 'COMPLETED' },
+                { id: 'tx_009', timestamp: '2025-07-07T12:00:00Z', type: 'BUY', symbol: 'SOL', cryptoName: 'Solana', quantity: 1, price: 150.00, totalAmount: 150.00, status: 'PENDING' },
+                { id: 'tx_010', timestamp: '2025-07-07T12:15:00Z', type: 'SELL', symbol: 'XLM', cryptoName: 'Stellar', quantity: 200, price: 0.12, totalAmount: 24.00, status: 'COMPLETED' },
+                { id: 'tx_011', timestamp: '2025-07-07T12:30:00Z', type: 'BUY', symbol: 'DOT', cryptoName: 'Polkadot', quantity: 10, price: 7.00, totalAmount: 70.00, status: 'COMPLETED' },
+                { id: 'tx_012', timestamp: '2025-07-07T12:45:00Z', type: 'SELL', symbol: 'BNB', cryptoName: 'Binance Coin', quantity: 0.1, price: 580.00, totalAmount: 58.00, status: 'COMPLETED' },
+                { id: 'tx_013', timestamp: '2025-07-07T13:00:00Z', type: 'BUY', symbol: 'TRX', cryptoName: 'Tron', quantity: 500, price: 0.07, totalAmount: 35.00, status: 'COMPLETED' },
+                { id: 'tx_014', timestamp: '2025-07-07T13:15:00Z', type: 'SELL', symbol: 'AVAX', cryptoName: 'Avalanche', quantity: 2, price: 28.00, totalAmount: 56.00, status: 'COMPLETED' },
+                { id: 'tx_015', timestamp: '2025-07-07T13:30:00Z', type: 'BUY', symbol: 'LINK', cryptoName: 'Chainlink', quantity: 3, price: 14.00, totalAmount: 42.00, status: 'COMPLETED' },
+                { id: 'tx_016', timestamp: '2025-07-07T13:45:00Z', type: 'SELL', symbol: 'UNI', cryptoName: 'Uniswap', quantity: 10, price: 9.00, totalAmount: 90.00, status: 'COMPLETED' },
+                { id: 'tx_017', timestamp: '2025-07-07T14:00:00Z', type: 'BUY', symbol: 'VET', cryptoName: 'VeChain', quantity: 2000, price: 0.02, totalAmount: 40.00, status: 'COMPLETED' },
+                { id: 'tx_018', timestamp: '2025-07-07T14:15:00Z', type: 'SELL', symbol: 'FIL', cryptoName: 'Filecoin', quantity: 1, price: 5.00, totalAmount: 5.00, status: 'COMPLETED' },
+                { id: 'tx_019', timestamp: '2025-07-07T14:30:00Z', type: 'BUY', symbol: 'ICP', cryptoName: 'Internet Computer', quantity: 0.5, price: 8.00, totalAmount: 4.00, status: 'PENDING' },
+                { id: 'tx_020', timestamp: '2025-07-07T14:45:00Z', type: 'SELL', symbol: 'NEAR', cryptoName: 'NEAR Protocol', quantity: 5, price: 6.00, totalAmount: 30.00, status: 'COMPLETED' }
+            ];
+
+            totalTransactions = fallbackTransactions.length;
+            renderTransactions({ transactions: fallbackTransactions, totalItems: totalTransactions });
+            updatePagination();
+
+            if (error) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-3 text-danger">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Failed to load transactions: ${error.message || 'Network error'}<br>
+                        <button class="btn btn-sm btn-outline-secondary mt-2" onclick="fetchTransactionHistory()">
+                            <i class="bi bi-arrow-clockwise"></i> Retry
+                        </button>
+                    </td></tr>`;
+                paginationInfo.textContent = 'Error loading data.';
+                paginationNav.innerHTML = '';
+            }
+        };
+
+        try {
+            console.log('[fetchTransactionHistory] Starting API request');
+
+            // Use a numeric user ID (in a real app, this would come from authentication)
+            const userId = localStorage.getItem('userId') || '1';
+            console.log(`[fetchTransactionHistory] Using user ID: ${userId}`);
+
+            const url = new URL(`/api/trade/history/${userId}`, window.location.origin);
+
+            // Use 1-based page numbering to match backend
+            url.searchParams.append('page', currentPage);
+            url.searchParams.append('size', pageSize);
+            url.searchParams.append('_', Date.now());
+
+            console.log(`[fetchTransactionHistory] API URL: ${url.toString()}`);
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => {
+                console.warn('[fetchTransactionHistory] Request timeout reached');
+                controller.abort();
+                useFallbackData(new Error('API request timed out'));
+            }, 5000); // 5 second timeout
+
+            console.log('[fetchTransactionHistory] Sending fetch request...');
+
+            let response;
+            try {
+                console.log('[fetchTransactionHistory] Creating fetch request with options:', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'include',
+                    signal: controller.signal
+                });
+
+                response = await fetch(url.toString(), {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'include',
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+                console.log(`[fetchTransactionHistory] Received response with status: ${response.status}`);
+
+                if (!response.ok) {
+                    let errorMessage = `HTTP error! Status: ${response.status} ${response.statusText}`;
+                    try {
+                        const errorData = await response.json();
+                        console.log('[fetchTransactionHistory] Error response data:', errorData);
+                        if (errorData.message) errorMessage = errorData.message;
+                    } catch (parseError) {
+                        console.warn('[fetchTransactionHistory] Failed to parse error response:', parseError);
+                    }
+                    throw new Error(errorMessage);
+                }
+
+                const data = await response.json();
+                console.log('[fetchTransactionHistory] Successfully parsed response data');
+
+                if (!data || (!data.transactions && !data.content)) {
+                    console.warn('[fetchTransactionHistory] Empty or invalid data structure:', data);
+                    throw new Error('Invalid or empty API response');
+                }
+
+                // Success case - process the data
+                totalTransactions = data.totalItems || (data.content ? data.content.length : data.transactions.length);
+                console.log(`[fetchTransactionHistory] Successfully fetched ${totalTransactions} transactions`);
+
+                // Update the UI with the fetched data
+                renderTransactions(data);
+                updatePagination();
+
+                return data;
+
+            } catch (error) {
+                clearTimeout(timeoutId); // Clear timeout if request completes with error
+                console.error('[fetchTransactionHistory] Error in fetch request:', error);
+                if (error.name === 'AbortError') {
+                    console.warn('[fetchTransactionHistory] Request was aborted');
+                    throw new Error('Request timed out');
+                }
+                throw error; // Re-throw to be caught by the outer try-catch
+            }
+        } catch (error) {
+            console.error('[fetchTransactionHistory] Using fallback data due to error:', error);
+            useFallbackData(error);
+        }
+    }
+
+    function renderTransactions(data) {
+        const tbody = document.getElementById('transactionHistoryBody');
+        tbody.innerHTML = '';
+
+        const transactionsToRender = data.transactions || data.content || [];
+
+        const paginatedTransactions = transactionsToRender.slice(
+            (currentPage - 1) * pageSize,
+            currentPage * pageSize
+        );
+
+        if (paginatedTransactions.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4">
+                    <i class="bi bi-inbox" style="font-size: 2rem; opacity: 0.3;"></i>
+                    <p class="mt-2">No transactions found for this page.</p>
+                </td></tr>`;
+        } else {
+            paginatedTransactions.forEach(tx => {
+                const row = tbody.insertRow();
+                const typeClass = tx.type.toUpperCase() === 'BUY' ? 'text-success' : 'text-danger';
+                const statusClass = tx.status === 'COMPLETED' ? 'success' : tx.status === 'PENDING' ? 'warning' : tx.status === 'FAILED' ? 'danger' : 'secondary';
+
+                const txDate = new Date(tx.timestamp);
+                const formattedDate = isNaN(txDate.getTime())
+                    ? 'Invalid Date'
+                    : txDate.toLocaleString(undefined, {
+                        year: 'numeric', month: 'short', day: 'numeric',
+                        hour: '2-digit', minute: '2-digit', second: '2-digit'
+                    });
+
+                row.innerHTML = `
+                        <td>${formattedDate}</td>
+                        <td><span class="fw-bold ${typeClass}">${tx.type.toUpperCase()}</span></td>
+                        <td>
+                            <span class="fw-bold">${tx.symbol}</span>
+                            ${tx.cryptoName ? `<small class="text-muted d-block">${tx.cryptoName}</small>` : ''}
+                        </td>
+                        <td>${tx.quantity !== undefined ? parseFloat(tx.quantity).toFixed(8) : 'N/A'} ${tx.symbol}</td>
+                        <td>${tx.price !== undefined ? formatPrice(tx.price) : 'N/A'}</td>
+                        <td>${tx.totalAmount !== undefined ? formatPrice(tx.totalAmount) : (tx.quantity !== undefined && tx.price !== undefined) ? formatPrice(tx.quantity * tx.price) : 'N/A'}</td>
+                        <td><span class="badge bg-${statusClass}">${tx.status || 'UNKNOWN'}</span></td>
+                    `;
+                row.style.cursor = 'pointer';
+                row.addEventListener('click', () => showTransactionDetails(tx));
+                tbody.appendChild(row);
+            });
+        }
+    }
+
+    function updatePagination() {
+        const paginationNav = document.getElementById('paginationNav');
+        const paginationInfo = document.getElementById('paginationInfo');
+        const totalPages = Math.ceil(totalTransactions / pageSize);
+        paginationNav.innerHTML = '';
+
+        if (totalPages <= 1 && totalTransactions === 0) {
+            paginationInfo.textContent = 'No transactions to display';
+            paginationNav.innerHTML = '';
+            return;
+        }
+
+        const startItem = ((currentPage - 1) * pageSize) + 1;
+        const endItem = Math.min(currentPage * pageSize, totalTransactions);
+        paginationInfo.textContent = `Showing ${startItem} to ${endItem} of ${totalTransactions} transactions`;
+
+
+        const prevClass = currentPage === 1 ? 'disabled' : '';
+        paginationNav.innerHTML += `<li class="page-item ${prevClass}"><a class="page-link" href="#" data-page="prev">Previous</a></li>`;
+
+        const maxVisiblePages = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        if (startPage > 1) {
+            paginationNav.innerHTML += `<li class="page-item"><a class="page-link" href="#" data-page="1">1</a></li>`;
+            if (startPage > 2) {
+                paginationNav.innerHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            const activeClass = i === currentPage ? 'active' : '';
+            paginationNav.innerHTML += `<li class="page-item ${activeClass}"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                paginationNav.innerHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+            }
+            paginationNav.innerHTML += `<li class="page-item"><a class="page-link" href="#" data-page="${totalPages}">${totalPages}</a></li>`;
+        }
+
+        const nextClass = currentPage === totalPages ? 'disabled' : '';
+        paginationNav.innerHTML += `<li class="page-item ${nextClass}"><a class="page-link" href="#" data-page="next">Next</a></li>`;
+
+        paginationNav.querySelectorAll('.page-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const pageAction = e.target.dataset.page;
+                if (pageAction === 'prev' && currentPage > 1) {
+                    currentPage--;
+                    fetchTransactionHistory();
+                } else if (pageAction === 'next' && currentPage < totalPages) {
+                    currentPage++;
+                    fetchTransactionHistory();
+                } else if (!isNaN(parseInt(pageAction)) && parseInt(pageAction) !== currentPage) {
+                    currentPage = parseInt(pageAction);
+                    fetchTransactionHistory();
+                }
+            });
+        });
+    }
+
+    function showTransactionDetails(transaction) {
+        document.getElementById('detailId').textContent = transaction.id || 'N/A';
+        const txDate = new Date(transaction.timestamp);
+        document.getElementById('detailDateTime').textContent = isNaN(txDate.getTime())
+            ? 'Invalid Date'
+            : txDate.toLocaleString(undefined, {
+                year: 'numeric', month: 'short', day: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit', timeZoneName: 'short'
+            });
+        document.getElementById('detailType').textContent = transaction.type ? transaction.type.toUpperCase() : 'N/A';
+        document.getElementById('detailSymbol').textContent = transaction.symbol || 'N/A';
+        document.getElementById('detailAmount').textContent = transaction.quantity !== undefined ? `${parseFloat(transaction.quantity).toFixed(8)} ${transaction.symbol}` : 'N/A';
+        document.getElementById('detailPrice').textContent = transaction.price !== undefined ? formatPrice(transaction.price) : 'N/A';
+        document.getElementById('detailTotal').textContent = transaction.totalAmount !== undefined ? formatPrice(transaction.totalAmount) : (transaction.quantity !== undefined && transaction.price !== undefined) ? formatPrice(transaction.quantity * tx.price) : 'N/A';
+        document.getElementById('detailStatus').textContent = transaction.status || 'N/A';
+        document.getElementById('detailNotes').textContent = transaction.notes || 'N/A';
+        document.getElementById('detailRawData').textContent = JSON.stringify(transaction, null, 2);
+
+        const transactionDetailsModal = new bootstrap.Modal(document.getElementById('transactionDetailsModal'));
+        transactionDetailsModal.show();
+    }
+
+
+    // Main application initialization for history.html
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('DOM fully loaded, initializing history page...');
+
+        // Instantiate WebSocketClient here
+        webSocketClient = new WebSocketClient();
+
+        // Setup WebSocket client callbacks
+        webSocketClient.onConnect = (frame) => {
+            updateConnectionStatus(true, 'Connected');
+            // Immediately fetch history upon connection
+            fetchTransactionHistory();
+        };
+
+        webSocketClient.onDisconnect = () => {
+            updateConnectionStatus(false, 'Disconnected');
+        };
+
+        webSocketClient.onError = (error) => {
+            console.error('Application WebSocket Error:', error);
+            updateConnectionStatus(false, `Error: ${error.message || 'Unknown'}`);
+        };
+
+        // Initial connection attempt
+        webSocketClient.connect();
+
+        // Reconnect button listener
+        const reconnectBtn = document.getElementById('reconnectBtn');
+        if (reconnectBtn) {
+            reconnectBtn.addEventListener('click', () => {
+                console.log('Manual reconnection requested.');
+                webSocketClient.disconnect();
+                webSocketClient.connect();
+            });
+        }
+
+        // Clean up on page unload
+        window.addEventListener('beforeunload', () => {
+            console.log('Cleaning up WebSocket resources on unload.');
+            if (webSocketClient) {
+                webSocketClient.disconnect();
+            }
+        });
+
+        // Transaction History Pagination and Refresh Listeners
+        document.getElementById('pageSizeSelect').addEventListener('change', (event) => {
+            pageSize = parseInt(event.target.value);
+            currentPage = 1; // Reset to first page when page size changes
+            fetchTransactionHistory();
+        });
+
+        document.getElementById('refreshHistoryBtn').addEventListener('click', () => {
+            fetchTransactionHistory();
+        });
+    });
+</script>
+</body>
+</html>
