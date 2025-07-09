@@ -14,6 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.math.RoundingMode;
 
 @Repository
 public class CryptoRepository {
@@ -114,6 +115,64 @@ public class CryptoRepository {
         final String sql = "UPDATE cryptocurrencies SET current_price = ?, last_updated = CURRENT_TIMESTAMP WHERE kraken_pair_name = ?";
         jdbcTemplate.update(sql, newPrice, krakenPairName);
     }
+    
+    public Optional<CryptoCurrencyEntity> findBySymbol(String symbol) {
+        final String sql = "SELECT id, symbol, name, kraken_pair_name, current_price, last_updated FROM cryptocurrencies WHERE symbol = ?";
+        List<CryptoCurrencyEntity> cryptos = jdbcTemplate.query(sql, new CryptocurrencyRowMapper(), symbol);
+        return cryptos.stream().findFirst();
+    }
+    
+    @Transactional
+    public void updateUserHolding(Long userId, Long cryptoId, BigDecimal quantity) {
+        // First ensure the user_holdings table exists
+        ensureUserHoldingsTableExists();
+        
+        // Check if the user already has a holding for this crypto
+        String checkSql = "SELECT COUNT(*) FROM user_holdings WHERE user_id = ? AND crypto_id = ?";
+        int count = jdbcTemplate.queryForObject(checkSql, Integer.class, userId, cryptoId);
+        
+        if (count > 0) {
+            // Update existing holding
+            String updateSql = "UPDATE user_holdings SET quantity = quantity + ? WHERE user_id = ? AND crypto_id = ?";
+            jdbcTemplate.update(updateSql, quantity, userId, cryptoId);
+        } else {
+            // Insert new holding
+            String insertSql = "INSERT INTO user_holdings (user_id, crypto_id, quantity) VALUES (?, ?, ?)";
+            jdbcTemplate.update(insertSql, userId, cryptoId, quantity);
+        }
+    }
+    
+    public BigDecimal getUserHolding(Long userId, Long cryptoId) {
+        ensureUserHoldingsTableExists();
+        
+        String sql = "SELECT COALESCE(SUM(quantity), 0) FROM user_holdings WHERE user_id = ? AND crypto_id = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, BigDecimal.class, userId, cryptoId)
+                    .setScale(8, RoundingMode.HALF_UP);
+        } catch (Exception e) {
+            logger.error("Error getting user holding", e);
+            return BigDecimal.ZERO;
+        }
+    }
+    
+    private void ensureUserHoldingsTableExists() {
+        if (!tableExists("user_holdings")) {
+            logger.info("Creating user_holdings table...");
+            jdbcTemplate.execute("""
+                CREATE TABLE IF NOT EXISTS user_holdings (
+                    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                    user_id BIGINT NOT NULL,
+                    crypto_id BIGINT NOT NULL,
+                    quantity DECIMAL(20, 8) NOT NULL,
+                    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    UNIQUE KEY unique_user_crypto (user_id, crypto_id),
+                    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                    FOREIGN KEY (crypto_id) REFERENCES cryptocurrencies(id) ON DELETE CASCADE
+                )
+                """);
+            logger.info("user_holdings table created successfully");
+        }
+    }
 
     public Optional<CryptoCurrencyEntity> findByKrakenPairName(String krakenPairName) {
         final String sql = "SELECT id, symbol, name, kraken_pair_name, current_price, last_updated FROM cryptocurrencies WHERE kraken_pair_name = ?";
@@ -191,7 +250,7 @@ public class CryptoRepository {
         }
     }
     
-    private boolean tableExists(String tableName) {
+    public boolean tableExists(String tableName) {
         try {
             logger.info("Checking if table {} exists...", tableName);
             
