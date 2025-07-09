@@ -11375,3 +11375,699 @@ LIMIT ? OFFSET ?
 2025-07-09 20:20:16 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
 2025-07-09 20:20:16 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
 2025-07-09 20:20:16 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-07-09 20:50:18 [main] INFO  c.t.Trading212.Trading212Application - Starting Trading212Application using Java 23 with PID 20732 (C:\Users\GGSwiftPro\Desktop\Trading212\target\classes started by GGSwiftPro in C:\Users\GGSwiftPro\Desktop\Trading212)
+2025-07-09 20:50:18 [main] DEBUG c.t.Trading212.Trading212Application - Running with Spring Boot v3.5.3, Spring v6.2.8
+2025-07-09 20:50:18 [main] INFO  c.t.Trading212.Trading212Application - No active profile set, falling back to 1 default profile: "default"
+2025-07-09 20:50:19 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2025-07-09 20:50:19 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JDBC repositories in DEFAULT mode.
+2025-07-09 20:50:19 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 20 ms. Found 0 JDBC repository interfaces.
+2025-07-09 20:50:19 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2025-07-09 20:50:19 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-07-09 20:50:19 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 6 ms. Found 0 JPA repository interfaces.
+2025-07-09 20:50:19 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2025-07-09 20:50:19 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-07-09 20:50:19 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.42]
+2025-07-09 20:50:20 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-07-09 20:50:20 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1866 ms
+2025-07-09 20:50:20 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-07-09 20:50:20 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@60dc1a4e
+2025-07-09 20:50:20 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-07-09 20:50:20 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-07-09 20:50:20 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.18.Final
+2025-07-09 20:50:20 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2025-07-09 20:50:21 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-07-09 20:50:21 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-07-09 20:50:21 [main] WARN  org.hibernate.orm.deprecation - HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-07-09 20:50:21 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-07-09 20:50:21 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-07-09 20:50:21 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-07-09 20:50:21 [main] INFO  c.t.Trading212.service.CryptoService - Starting cryptocurrency data initialization...
+2025-07-09 20:50:21 [main] INFO  c.t.T.repository.CryptoRepository - Checking if table cryptocurrencies exists...
+2025-07-09 20:50:21 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 20:50:21 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?]
+2025-07-09 20:50:22 [main] INFO  c.t.T.repository.CryptoRepository - Table cryptocurrencies exists in information_schema
+2025-07-09 20:50:22 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing SQL query [SELECT 1 FROM cryptocurrencies LIMIT 1]
+2025-07-09 20:50:22 [main] INFO  c.t.T.repository.CryptoRepository - Successfully queried table cryptocurrencies
+2025-07-09 20:50:22 [main] INFO  c.t.T.repository.CryptoRepository - Fetching up to 1000 cryptocurrencies starting from offset 0...
+2025-07-09 20:50:22 [main] INFO  c.t.T.repository.CryptoRepository - Checking if table cryptocurrencies exists...
+2025-07-09 20:50:22 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 20:50:22 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?]
+2025-07-09 20:50:22 [main] INFO  c.t.T.repository.CryptoRepository - Table cryptocurrencies exists in information_schema
+2025-07-09 20:50:22 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing SQL query [SELECT 1 FROM cryptocurrencies LIMIT 1]
+2025-07-09 20:50:22 [main] INFO  c.t.T.repository.CryptoRepository - Successfully queried table cryptocurrencies
+2025-07-09 20:50:22 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing SQL query [SELECT COUNT(*) FROM cryptocurrencies]
+2025-07-09 20:50:22 [main] INFO  c.t.T.repository.CryptoRepository - Found 23 total cryptocurrency records in the database
+2025-07-09 20:50:22 [main] DEBUG c.t.T.repository.CryptoRepository - Executing query: SELECT id, symbol, name, kraken_pair_name, current_price, last_updated
+FROM cryptocurrencies
+ORDER BY symbol
+LIMIT ? OFFSET ?
+ with limit=1000, offset=0
+2025-07-09 20:50:22 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 20:50:22 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT id, symbol, name, kraken_pair_name, current_price, last_updated
+FROM cryptocurrencies
+ORDER BY symbol
+LIMIT ? OFFSET ?
+]
+2025-07-09 20:50:22 [main] INFO  c.t.T.repository.CryptoRepository - Retrieved 23 cryptocurrency records (showing first 3): [ADA ($0.58), ATOM ($4.05), AVAX ($0.00)]
+2025-07-09 20:50:22 [main] INFO  c.t.Trading212.service.CryptoService - Initialized 20 cryptocurrencies
+2025-07-09 20:50:22 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 20:50:22 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT * FROM users WHERE username = ?]
+2025-07-09 20:50:22 [main] INFO  c.t.Trading212.service.UserService - Default user already exists.
+2025-07-09 20:50:22 [main] INFO  c.t.T.s.W.KrakenWebSocketClient - Initializing Kraken WebSocket client...
+2025-07-09 20:50:22 [main] INFO  c.t.T.s.W.KrakenWebSocketClient - Attempting to connect to Kraken WebSocket API at: wss://ws.kraken.com/
+2025-07-09 20:50:22 [main] INFO  c.t.T.s.W.KrakenWebSocketClient - Subscribing to pairs: [XBT/USD, ETH/USD, ADA/USD, XRP/USD, LTC/USD, BCH/USD, DOT/USD, LINK/USD, SOL/USD, UNI/USD, DOGE/USD, TRX/USD, ETC/USD, XLM/USD, EOS/USD, XTZ/USD, ATOM/USD, FIL/USD]
+2025-07-09 20:50:22 [main] INFO  c.t.T.s.W.KrakenWebSocketClient - Creating new WebSocket connection to: wss://ws.kraken.com/
+2025-07-09 20:50:22 [main] INFO  c.t.T.s.W.KrakenWebSocketClient - Waiting for WebSocket connection to be established...
+2025-07-09 20:50:23 [ForkJoinPool.commonPool-worker-1] INFO  c.t.T.s.W.KrakenWebSocketClient - WebSocket connection opened successfully to Kraken API
+2025-07-09 20:50:23 [ForkJoinPool.commonPool-worker-1] DEBUG c.t.T.s.W.KrakenWebSocketClient - Sending subscribe message: {"event":"subscribe","subscription":{"name":"ticker"},"pair":["XBT/USD","ETH/USD","ADA/USD","XRP/USD","LTC/USD","BCH/USD","DOT/USD","LINK/USD","SOL/USD","UNI/USD","DOGE/USD","TRX/USD","ETC/USD","XLM/USD","EOS/USD","XTZ/USD","ATOM/USD","FIL/USD"]}
+2025-07-09 20:50:23 [ForkJoinPool.commonPool-worker-1] INFO  c.t.T.s.W.KrakenWebSocketClient - Subscription message sent for 18 pairs
+2025-07-09 20:50:23 [ForkJoinPool.commonPool-worker-1] INFO  c.t.T.s.W.KrakenWebSocketClient - WebSocket connection future completed
+2025-07-09 20:50:23 [main] INFO  c.t.T.s.W.KrakenWebSocketClient - WebSocket connection established and ready for use
+2025-07-09 20:50:24 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-07-09 20:50:24 [main] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2025-07-09 20:50:24 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Starting...
+2025-07-09 20:50:24 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@7ead0b51]]
+2025-07-09 20:50:24 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Started.
+2025-07-09 20:50:24 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2025-07-09 20:50:24 [main] INFO  c.t.Trading212.Trading212Application - Started Trading212Application in 7.565 seconds (process running for 8.168)
+2025-07-09 20:50:24 [MessageBroker-2] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=1, message=Periodic update #1, timestamp=2025-07-09T20:50:24.894738400}
+2025-07-09 20:50:25 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-07-09 20:50:25 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-07-09 20:50:25 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2025-07-09 20:50:25 [http-nio-8080-exec-2] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 20:50:25 [http-nio-8080-exec-2] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT * FROM users WHERE username = ?]
+2025-07-09 20:50:29 [http-nio-8080-exec-4] INFO  c.t.T.repository.CryptoRepository - Fetching up to 1000 cryptocurrencies starting from offset 0...
+2025-07-09 20:50:29 [http-nio-8080-exec-4] INFO  c.t.T.repository.CryptoRepository - Checking if table cryptocurrencies exists...
+2025-07-09 20:50:29 [http-nio-8080-exec-4] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 20:50:29 [http-nio-8080-exec-4] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?]
+2025-07-09 20:50:29 [http-nio-8080-exec-4] INFO  c.t.T.repository.CryptoRepository - Table cryptocurrencies exists in information_schema
+2025-07-09 20:50:29 [http-nio-8080-exec-4] DEBUG o.s.jdbc.core.JdbcTemplate - Executing SQL query [SELECT 1 FROM cryptocurrencies LIMIT 1]
+2025-07-09 20:50:29 [http-nio-8080-exec-4] INFO  c.t.T.repository.CryptoRepository - Successfully queried table cryptocurrencies
+2025-07-09 20:50:29 [http-nio-8080-exec-4] DEBUG o.s.jdbc.core.JdbcTemplate - Executing SQL query [SELECT COUNT(*) FROM cryptocurrencies]
+2025-07-09 20:50:29 [http-nio-8080-exec-4] INFO  c.t.T.repository.CryptoRepository - Found 23 total cryptocurrency records in the database
+2025-07-09 20:50:29 [http-nio-8080-exec-4] DEBUG c.t.T.repository.CryptoRepository - Executing query: SELECT id, symbol, name, kraken_pair_name, current_price, last_updated
+FROM cryptocurrencies
+ORDER BY symbol
+LIMIT ? OFFSET ?
+ with limit=1000, offset=0
+2025-07-09 20:50:29 [http-nio-8080-exec-4] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 20:50:29 [http-nio-8080-exec-4] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT id, symbol, name, kraken_pair_name, current_price, last_updated
+FROM cryptocurrencies
+ORDER BY symbol
+LIMIT ? OFFSET ?
+]
+2025-07-09 20:50:29 [http-nio-8080-exec-4] INFO  c.t.T.repository.CryptoRepository - Retrieved 23 cryptocurrency records (showing first 3): [ADA ($0.58), ATOM ($4.05), AVAX ($0.00)]
+2025-07-09 20:50:29 [http-nio-8080-exec-5] INFO  c.t.T.c.WebSocketLoggingInterceptor - WebSocket connection attempt from: /[0:0:0:0:0:0:0:1]:10026 [Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0]
+2025-07-09 20:50:29 [http-nio-8080-exec-5] DEBUG c.t.T.c.WebSocketLoggingInterceptor - WebSocket Headers: [host:"localhost:8080", connection:"Upgrade", pragma:"no-cache", cache-control:"no-cache", user-agent:"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0", upgrade:"websocket", origin:"http://localhost:8080", sec-websocket-version:"13", accept-encoding:"gzip, deflate, br, zstd", accept-language:"en-US,en;q=0.9", sec-websocket-key:"1WTH3Q3iezrBY+8n4K4ofg==", sec-websocket-extensions:"permessage-deflate; client_max_window_bits"]
+2025-07-09 20:50:29 [http-nio-8080-exec-5] INFO  c.t.T.c.WebSocketLoggingInterceptor - WebSocket connection established: /[0:0:0:0:0:0:0:1]:10026
+2025-07-09 20:50:29 [http-nio-8080-exec-8] INFO  c.t.T.c.WebSocketLoggingInterceptor - WebSocket connection attempt from: /[0:0:0:0:0:0:0:1]:10027 [Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0]
+2025-07-09 20:50:29 [http-nio-8080-exec-8] DEBUG c.t.T.c.WebSocketLoggingInterceptor - WebSocket Headers: [host:"localhost:8080", connection:"Upgrade", pragma:"no-cache", cache-control:"no-cache", user-agent:"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0", upgrade:"websocket", origin:"http://localhost:8080", sec-websocket-version:"13", accept-encoding:"gzip, deflate, br, zstd", accept-language:"en-US,en;q=0.9", sec-websocket-key:"oOFhkBvy7bVYg+zniOir/g==", sec-websocket-extensions:"permessage-deflate; client_max_window_bits"]
+2025-07-09 20:50:29 [http-nio-8080-exec-8] INFO  c.t.T.c.WebSocketLoggingInterceptor - WebSocket connection established: /[0:0:0:0:0:0:0:1]:10027
+2025-07-09 20:50:29 [http-nio-8080-exec-8] DEBUG c.t.Trading212.util.WebSocketUtils - INBOUND Command: CONNECT, Session: cprutmkc, Headers: {simpMessageType=CONNECT, stompCommand=CONNECT, nativeHeaders={heart-beat=[10000,10000], accept-version=[1.1,1.0], host=[localhost:8080]}, simpSessionAttributes={}, simpHeartbeat=[J@648368e0, simpSessionId=cprutmkc}
+2025-07-09 20:50:29 [http-nio-8080-exec-5] DEBUG c.t.Trading212.util.WebSocketUtils - INBOUND Command: CONNECT, Session: g4svrj3t, Headers: {simpMessageType=CONNECT, stompCommand=CONNECT, nativeHeaders={heart-beat=[10000,10000], accept-version=[1.1,1.0], host=[localhost:8080]}, simpSessionAttributes={}, simpHeartbeat=[J@bf99047, simpSessionId=g4svrj3t}
+2025-07-09 20:50:29 [clientOutboundChannel-1] INFO  c.t.T.c.WebSocketTestController - New WebSocket connection: session=g4svrj3t, user=anonymous, total=1
+2025-07-09 20:50:29 [clientOutboundChannel-2] INFO  c.t.T.c.WebSocketTestController - New WebSocket connection: session=cprutmkc, user=anonymous, total=2
+2025-07-09 20:50:29 [clientOutboundChannel-1] INFO  c.t.T.l.WebSocketEventListener - WebSocket connection established - Session ID: g4svrj3t
+2025-07-09 20:50:29 [clientOutboundChannel-2] INFO  c.t.T.l.WebSocketEventListener - WebSocket connection established - Session ID: cprutmkc
+2025-07-09 20:50:29 [http-nio-8080-exec-9] DEBUG c.t.Trading212.util.WebSocketUtils - INBOUND Command: SUBSCRIBE, Session: g4svrj3t, Destination: /topic/prices, Subscription: sub-0, Headers: {simpMessageType=SUBSCRIBE, stompCommand=SUBSCRIBE, nativeHeaders={id=[sub-0], destination=[/topic/prices]}, simpSessionAttributes={}, simpHeartbeat=[J@3160be0a, simpSubscriptionId=sub-0, simpSessionId=g4svrj3t, simpDestination=/topic/prices}
+2025-07-09 20:50:29 [http-nio-8080-exec-9] INFO  c.t.T.l.WebSocketEventListener - New subscription - Session: unknown, Destination: /topic/prices
+2025-07-09 20:50:29 [http-nio-8080-exec-9] DEBUG c.t.Trading212.util.WebSocketUtils - INBOUND Command: SUBSCRIBE, Session: g4svrj3t, Destination: /topic/updates, Subscription: sub-1, Headers: {simpMessageType=SUBSCRIBE, stompCommand=SUBSCRIBE, nativeHeaders={id=[sub-1], destination=[/topic/updates]}, simpSessionAttributes={}, simpHeartbeat=[J@4faec7bd, simpSubscriptionId=sub-1, simpSessionId=g4svrj3t, simpDestination=/topic/updates}
+2025-07-09 20:50:29 [http-nio-8080-exec-9] INFO  c.t.T.l.WebSocketEventListener - New subscription - Session: unknown, Destination: /topic/updates
+2025-07-09 20:50:29 [http-nio-8080-exec-9] DEBUG c.t.Trading212.util.WebSocketUtils - INBOUND Command: SUBSCRIBE, Session: g4svrj3t, Destination: /topic/broadcast, Subscription: sub-2, Headers: {simpMessageType=SUBSCRIBE, stompCommand=SUBSCRIBE, nativeHeaders={id=[sub-2], destination=[/topic/broadcast]}, simpSessionAttributes={}, simpHeartbeat=[J@1c70316a, simpSubscriptionId=sub-2, simpSessionId=g4svrj3t, simpDestination=/topic/broadcast}
+2025-07-09 20:50:29 [http-nio-8080-exec-9] INFO  c.t.T.l.WebSocketEventListener - New subscription - Session: unknown, Destination: /topic/broadcast
+2025-07-09 20:50:29 [http-nio-8080-exec-9] DEBUG c.t.Trading212.util.WebSocketUtils - INBOUND Command: SUBSCRIBE, Session: g4svrj3t, Destination: /user/queue/notifications, Subscription: sub-3, Headers: {simpMessageType=SUBSCRIBE, stompCommand=SUBSCRIBE, nativeHeaders={id=[sub-3], destination=[/user/queue/notifications]}, simpSessionAttributes={}, simpHeartbeat=[J@767c5c5b, simpSubscriptionId=sub-3, simpSessionId=g4svrj3t, simpDestination=/user/queue/notifications}
+2025-07-09 20:50:29 [http-nio-8080-exec-9] INFO  c.t.T.l.WebSocketEventListener - New subscription - Session: unknown, Destination: /user/queue/notifications
+2025-07-09 20:50:29 [http-nio-8080-exec-9] ERROR o.s.w.s.m.StompSubProtocolHandler - Failed to parse TextMessage payload=[SEND
+desti..], byteCount=394, last=true] in session g4svrj3t. Sending STOMP ERROR to client.
+org.springframework.messaging.simp.stomp.StompConversionException: Illegal escape sequence at index 54: {"destination":"/app/test/echo","headers":{},"body":"{\"action\":\"connection_test\",\"timestamp\":\"2025-07-09T17:50:29.694Z\",\"clientInfo\":{\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0\",\"timezone\":\"Europe/Kiev\",\"screenResolution\":\"1920x1080\"}}"}
+	at org.springframework.messaging.simp.stomp.StompDecoder.unescape(StompDecoder.java:295)
+	at org.springframework.messaging.simp.stomp.StompDecoder.readHeaders(StompDecoder.java:246)
+	at org.springframework.messaging.simp.stomp.StompDecoder.decodeMessage(StompDecoder.java:147)
+	at org.springframework.messaging.simp.stomp.StompDecoder.decode(StompDecoder.java:114)
+	at org.springframework.messaging.simp.stomp.BufferingStompDecoder.decode(BufferingStompDecoder.java:112)
+	at org.springframework.web.socket.messaging.StompSubProtocolHandler.handleMessageFromClient(StompSubProtocolHandler.java:279)
+	at org.springframework.web.socket.messaging.SubProtocolWebSocketHandler.handleMessage(SubProtocolWebSocketHandler.java:357)
+	at org.springframework.web.socket.handler.WebSocketHandlerDecorator.handleMessage(WebSocketHandlerDecorator.java:75)
+	at org.springframework.web.socket.handler.LoggingWebSocketHandlerDecorator.handleMessage(LoggingWebSocketHandlerDecorator.java:56)
+	at org.springframework.web.socket.handler.ExceptionWebSocketHandlerDecorator.handleMessage(ExceptionWebSocketHandlerDecorator.java:58)
+	at org.springframework.web.socket.sockjs.transport.session.AbstractSockJsSession.delegateMessages(AbstractSockJsSession.java:346)
+	at org.springframework.web.socket.sockjs.transport.session.WebSocketServerSockJsSession.handleMessage(WebSocketServerSockJsSession.java:199)
+	at org.springframework.web.socket.sockjs.transport.handler.SockJsWebSocketHandler.handleTextMessage(SockJsWebSocketHandler.java:93)
+	at org.springframework.web.socket.handler.AbstractWebSocketHandler.handleMessage(AbstractWebSocketHandler.java:43)
+	at org.springframework.web.socket.adapter.standard.StandardWebSocketHandlerAdapter.handleTextMessage(StandardWebSocketHandlerAdapter.java:113)
+	at org.springframework.web.socket.adapter.standard.StandardWebSocketHandlerAdapter$3.onMessage(StandardWebSocketHandlerAdapter.java:84)
+	at org.springframework.web.socket.adapter.standard.StandardWebSocketHandlerAdapter$3.onMessage(StandardWebSocketHandlerAdapter.java:81)
+	at org.apache.tomcat.websocket.WsFrameBase.sendMessageText(WsFrameBase.java:389)
+	at org.apache.tomcat.websocket.server.WsFrameServer.sendMessageText(WsFrameServer.java:130)
+	at org.apache.tomcat.websocket.WsFrameBase.processDataText(WsFrameBase.java:483)
+	at org.apache.tomcat.websocket.WsFrameBase.processData(WsFrameBase.java:283)
+	at org.apache.tomcat.websocket.WsFrameBase.processInputBuffer(WsFrameBase.java:129)
+	at org.apache.tomcat.websocket.server.WsFrameServer.onDataAvailable(WsFrameServer.java:85)
+	at org.apache.tomcat.websocket.server.WsFrameServer.doOnDataAvailable(WsFrameServer.java:184)
+	at org.apache.tomcat.websocket.server.WsFrameServer.notifyDataAvailable(WsFrameServer.java:164)
+	at org.apache.tomcat.websocket.server.WsHttpUpgradeHandler.upgradeDispatch(WsHttpUpgradeHandler.java:152)
+	at org.apache.coyote.http11.upgrade.UpgradeProcessorInternal.dispatch(UpgradeProcessorInternal.java:60)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:57)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1769)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1189)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:658)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:1575)
+2025-07-09 20:50:29 [http-nio-8080-exec-9] INFO  c.t.T.c.WebSocketTestController - WebSocket disconnected: session=g4svrj3t, user=anonymous, remaining=1
+2025-07-09 20:50:29 [http-nio-8080-exec-9] INFO  c.t.T.l.WebSocketEventListener - WebSocket connection closed - Session ID: g4svrj3t
+2025-07-09 20:50:29 [http-nio-8080-exec-9] DEBUG c.t.Trading212.util.WebSocketUtils - INBOUND Command: DISCONNECT, Session: g4svrj3t, Payload Type: byte[]
+2025-07-09 20:50:30 [http-nio-8080-exec-10] INFO  c.t.T.repository.CryptoRepository - Fetching up to 1000 cryptocurrencies starting from offset 0...
+2025-07-09 20:50:30 [http-nio-8080-exec-10] INFO  c.t.T.repository.CryptoRepository - Checking if table cryptocurrencies exists...
+2025-07-09 20:50:30 [http-nio-8080-exec-10] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 20:50:30 [http-nio-8080-exec-10] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?]
+2025-07-09 20:50:30 [http-nio-8080-exec-10] INFO  c.t.T.repository.CryptoRepository - Table cryptocurrencies exists in information_schema
+2025-07-09 20:50:30 [http-nio-8080-exec-10] DEBUG o.s.jdbc.core.JdbcTemplate - Executing SQL query [SELECT 1 FROM cryptocurrencies LIMIT 1]
+2025-07-09 20:50:30 [http-nio-8080-exec-10] INFO  c.t.T.repository.CryptoRepository - Successfully queried table cryptocurrencies
+2025-07-09 20:50:30 [http-nio-8080-exec-10] DEBUG o.s.jdbc.core.JdbcTemplate - Executing SQL query [SELECT COUNT(*) FROM cryptocurrencies]
+2025-07-09 20:50:30 [http-nio-8080-exec-10] INFO  c.t.T.repository.CryptoRepository - Found 23 total cryptocurrency records in the database
+2025-07-09 20:50:30 [http-nio-8080-exec-10] DEBUG c.t.T.repository.CryptoRepository - Executing query: SELECT id, symbol, name, kraken_pair_name, current_price, last_updated
+FROM cryptocurrencies
+ORDER BY symbol
+LIMIT ? OFFSET ?
+ with limit=1000, offset=0
+2025-07-09 20:50:30 [http-nio-8080-exec-10] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 20:50:30 [http-nio-8080-exec-10] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT id, symbol, name, kraken_pair_name, current_price, last_updated
+FROM cryptocurrencies
+ORDER BY symbol
+LIMIT ? OFFSET ?
+]
+2025-07-09 20:50:30 [http-nio-8080-exec-10] INFO  c.t.T.repository.CryptoRepository - Retrieved 23 cryptocurrency records (showing first 3): [ADA ($0.58), ATOM ($4.05), AVAX ($0.00)]
+2025-07-09 20:50:30 [http-nio-8080-exec-1] INFO  c.t.T.repository.CryptoRepository - Fetching up to 1000 cryptocurrencies starting from offset 0...
+2025-07-09 20:50:30 [http-nio-8080-exec-1] INFO  c.t.T.repository.CryptoRepository - Checking if table cryptocurrencies exists...
+2025-07-09 20:50:30 [http-nio-8080-exec-1] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 20:50:30 [http-nio-8080-exec-1] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?]
+2025-07-09 20:50:30 [http-nio-8080-exec-1] INFO  c.t.T.repository.CryptoRepository - Table cryptocurrencies exists in information_schema
+2025-07-09 20:50:30 [http-nio-8080-exec-1] DEBUG o.s.jdbc.core.JdbcTemplate - Executing SQL query [SELECT 1 FROM cryptocurrencies LIMIT 1]
+2025-07-09 20:50:30 [http-nio-8080-exec-1] INFO  c.t.T.repository.CryptoRepository - Successfully queried table cryptocurrencies
+2025-07-09 20:50:30 [http-nio-8080-exec-1] DEBUG o.s.jdbc.core.JdbcTemplate - Executing SQL query [SELECT COUNT(*) FROM cryptocurrencies]
+2025-07-09 20:50:30 [http-nio-8080-exec-1] INFO  c.t.T.repository.CryptoRepository - Found 23 total cryptocurrency records in the database
+2025-07-09 20:50:30 [http-nio-8080-exec-1] DEBUG c.t.T.repository.CryptoRepository - Executing query: SELECT id, symbol, name, kraken_pair_name, current_price, last_updated
+FROM cryptocurrencies
+ORDER BY symbol
+LIMIT ? OFFSET ?
+ with limit=1000, offset=0
+2025-07-09 20:50:30 [http-nio-8080-exec-1] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 20:50:30 [http-nio-8080-exec-1] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT id, symbol, name, kraken_pair_name, current_price, last_updated
+FROM cryptocurrencies
+ORDER BY symbol
+LIMIT ? OFFSET ?
+]
+2025-07-09 20:50:30 [http-nio-8080-exec-1] INFO  c.t.T.repository.CryptoRepository - Retrieved 23 cryptocurrency records (showing first 3): [ADA ($0.58), ATOM ($4.05), AVAX ($0.00)]
+2025-07-09 20:50:30 [http-nio-8080-exec-2] INFO  c.t.T.c.WebSocketTestController - WebSocket disconnected: session=cprutmkc, user=anonymous, remaining=0
+2025-07-09 20:50:30 [http-nio-8080-exec-2] INFO  c.t.T.l.WebSocketEventListener - WebSocket connection closed - Session ID: cprutmkc
+2025-07-09 20:50:30 [http-nio-8080-exec-2] DEBUG c.t.Trading212.util.WebSocketUtils - INBOUND Command: DISCONNECT, Session: cprutmkc, Payload Type: byte[]
+2025-07-09 20:50:30 [http-nio-8080-exec-3] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 20:50:30 [http-nio-8080-exec-3] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT * FROM users WHERE username = ?]
+2025-07-09 20:50:34 [MessageBroker-3] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=2, message=Periodic update #2, timestamp=2025-07-09T20:50:34.888098100}
+2025-07-09 20:50:44 [MessageBroker-2] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=3, message=Periodic update #3, timestamp=2025-07-09T20:50:44.884984500}
+2025-07-09 20:50:54 [MessageBroker-1] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=4, message=Periodic update #4, timestamp=2025-07-09T20:50:54.891039}
+2025-07-09 20:51:04 [MessageBroker-6] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=5, message=Periodic update #5, timestamp=2025-07-09T20:51:04.882520500}
+2025-07-09 20:51:14 [MessageBroker-8] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=6, message=Periodic update #6, timestamp=2025-07-09T20:51:14.885606200}
+2025-07-09 20:51:24 [MessageBroker-7] INFO  o.s.w.s.c.WebSocketMessageBrokerStats - WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 2 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(2)-CONNECTED(2)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 24, active threads = 0, queued tasks = 0, completed tasks = 24], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 4], sockJsScheduler[pool size = 15, active threads = 1, queued tasks = 3, completed tasks = 9]
+2025-07-09 20:51:24 [MessageBroker-9] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=7, message=Periodic update #7, timestamp=2025-07-09T20:51:24.887545800}
+2025-07-09 20:51:34 [MessageBroker-10] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=8, message=Periodic update #8, timestamp=2025-07-09T20:51:34.880398700}
+2025-07-09 20:51:44 [MessageBroker-10] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=9, message=Periodic update #9, timestamp=2025-07-09T20:51:44.888662700}
+2025-07-09 20:51:54 [MessageBroker-10] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=10, message=Periodic update #10, timestamp=2025-07-09T20:51:54.880195300}
+2025-07-09 20:52:04 [MessageBroker-4] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=11, message=Periodic update #11, timestamp=2025-07-09T20:52:04.883337700}
+2025-07-09 20:52:14 [MessageBroker-4] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=12, message=Periodic update #12, timestamp=2025-07-09T20:52:14.886448200}
+2025-07-09 20:52:24 [MessageBroker-4] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=13, message=Periodic update #13, timestamp=2025-07-09T20:52:24.880918300}
+2025-07-09 20:52:34 [MessageBroker-8] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=14, message=Periodic update #14, timestamp=2025-07-09T20:52:34.890574200}
+2025-07-09 20:52:44 [MessageBroker-8] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=15, message=Periodic update #15, timestamp=2025-07-09T20:52:44.894756600}
+2025-07-09 20:52:54 [MessageBroker-8] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=16, message=Periodic update #16, timestamp=2025-07-09T20:52:54.880389200}
+2025-07-09 20:53:04 [MessageBroker-3] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=17, message=Periodic update #17, timestamp=2025-07-09T20:53:04.891531700}
+2025-07-09 20:53:14 [MessageBroker-3] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=18, message=Periodic update #18, timestamp=2025-07-09T20:53:14.889977}
+2025-07-09 20:53:24 [MessageBroker-3] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=19, message=Periodic update #19, timestamp=2025-07-09T20:53:24.894895700}
+2025-07-09 20:53:34 [MessageBroker-2] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=20, message=Periodic update #20, timestamp=2025-07-09T20:53:34.882639100}
+2025-07-09 20:53:44 [MessageBroker-2] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=21, message=Periodic update #21, timestamp=2025-07-09T20:53:44.890548500}
+2025-07-09 20:53:54 [MessageBroker-2] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=22, message=Periodic update #22, timestamp=2025-07-09T20:53:54.885085}
+2025-07-09 20:54:04 [MessageBroker-13] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=23, message=Periodic update #23, timestamp=2025-07-09T20:54:04.889621600}
+2025-07-09 20:54:14 [MessageBroker-13] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=24, message=Periodic update #24, timestamp=2025-07-09T20:54:14.893009100}
+2025-07-09 20:54:24 [MessageBroker-13] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=25, message=Periodic update #25, timestamp=2025-07-09T20:54:24.891968500}
+2025-07-09 20:54:34 [MessageBroker-9] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=26, message=Periodic update #26, timestamp=2025-07-09T20:54:34.890040}
+2025-07-09 20:54:44 [MessageBroker-9] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=27, message=Periodic update #27, timestamp=2025-07-09T20:54:44.894163700}
+2025-07-09 20:54:54 [MessageBroker-9] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=28, message=Periodic update #28, timestamp=2025-07-09T20:54:54.892330800}
+2025-07-09 20:55:04 [MessageBroker-3] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=29, message=Periodic update #29, timestamp=2025-07-09T20:55:04.893889800}
+2025-07-09 20:55:14 [MessageBroker-3] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=30, message=Periodic update #30, timestamp=2025-07-09T20:55:14.880720}
+2025-07-09 20:55:24 [MessageBroker-3] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=31, message=Periodic update #31, timestamp=2025-07-09T20:55:24.884345700}
+2025-07-09 20:55:34 [MessageBroker-15] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=32, message=Periodic update #32, timestamp=2025-07-09T20:55:34.891459100}
+2025-07-09 20:55:44 [MessageBroker-15] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=33, message=Periodic update #33, timestamp=2025-07-09T20:55:44.880096800}
+2025-07-09 20:55:54 [MessageBroker-15] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=34, message=Periodic update #34, timestamp=2025-07-09T20:55:54.884623900}
+2025-07-09 20:56:04 [MessageBroker-10] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=35, message=Periodic update #35, timestamp=2025-07-09T20:56:04.894744200}
+2025-07-09 20:56:14 [MessageBroker-10] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=36, message=Periodic update #36, timestamp=2025-07-09T20:56:14.884500800}
+2025-07-09 20:56:24 [MessageBroker-10] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=37, message=Periodic update #37, timestamp=2025-07-09T20:56:24.891101800}
+2025-07-09 20:56:34 [MessageBroker-11] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=38, message=Periodic update #38, timestamp=2025-07-09T20:56:34.882020800}
+2025-07-09 20:56:44 [MessageBroker-11] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=39, message=Periodic update #39, timestamp=2025-07-09T20:56:44.893483600}
+2025-07-09 20:56:54 [MessageBroker-11] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=40, message=Periodic update #40, timestamp=2025-07-09T20:56:54.886124800}
+2025-07-09 20:57:04 [MessageBroker-12] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=41, message=Periodic update #41, timestamp=2025-07-09T20:57:04.890729800}
+2025-07-09 20:57:14 [MessageBroker-12] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=42, message=Periodic update #42, timestamp=2025-07-09T20:57:14.884330800}
+2025-07-09 20:57:24 [MessageBroker-12] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=43, message=Periodic update #43, timestamp=2025-07-09T20:57:24.891730400}
+2025-07-09 20:57:34 [MessageBroker-9] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=44, message=Periodic update #44, timestamp=2025-07-09T20:57:34.890660500}
+2025-07-09 20:57:44 [MessageBroker-9] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=45, message=Periodic update #45, timestamp=2025-07-09T20:57:44.892815}
+2025-07-09 20:57:54 [MessageBroker-5] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=46, message=Periodic update #46, timestamp=2025-07-09T20:57:54.889569100}
+2025-07-09 20:58:04 [MessageBroker-14] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=47, message=Periodic update #47, timestamp=2025-07-09T20:58:04.893585500}
+2025-07-09 20:58:14 [MessageBroker-14] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=48, message=Periodic update #48, timestamp=2025-07-09T20:58:14.889572400}
+2025-07-09 20:58:24 [MessageBroker-14] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=49, message=Periodic update #49, timestamp=2025-07-09T20:58:24.891411900}
+2025-07-09 20:58:34 [MessageBroker-6] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=50, message=Periodic update #50, timestamp=2025-07-09T20:58:34.881839800}
+2025-07-09 20:58:44 [MessageBroker-6] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=51, message=Periodic update #51, timestamp=2025-07-09T20:58:44.885222900}
+2025-07-09 20:58:54 [MessageBroker-6] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=52, message=Periodic update #52, timestamp=2025-07-09T20:58:54.883120}
+2025-07-09 20:59:04 [MessageBroker-16] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=53, message=Periodic update #53, timestamp=2025-07-09T20:59:04.880665700}
+2025-07-09 20:59:14 [MessageBroker-16] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=54, message=Periodic update #54, timestamp=2025-07-09T20:59:14.892172200}
+2025-07-09 20:59:24 [MessageBroker-16] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=55, message=Periodic update #55, timestamp=2025-07-09T20:59:24.887080100}
+2025-07-09 20:59:34 [MessageBroker-8] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=56, message=Periodic update #56, timestamp=2025-07-09T20:59:34.885509100}
+2025-07-09 20:59:44 [MessageBroker-8] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=57, message=Periodic update #57, timestamp=2025-07-09T20:59:44.889836100}
+2025-07-09 20:59:54 [MessageBroker-8] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=58, message=Periodic update #58, timestamp=2025-07-09T20:59:54.886136300}
+2025-07-09 21:00:04 [MessageBroker-6] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=59, message=Periodic update #59, timestamp=2025-07-09T21:00:04.882308200}
+2025-07-09 21:00:14 [MessageBroker-6] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=60, message=Periodic update #60, timestamp=2025-07-09T21:00:14.892094600}
+2025-07-09 21:00:24 [MessageBroker-6] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=61, message=Periodic update #61, timestamp=2025-07-09T21:00:24.892099700}
+2025-07-09 21:00:34 [MessageBroker-3] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=62, message=Periodic update #62, timestamp=2025-07-09T21:00:34.883535100}
+2025-07-09 21:00:44 [MessageBroker-3] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=63, message=Periodic update #63, timestamp=2025-07-09T21:00:44.892101}
+2025-07-09 21:00:54 [MessageBroker-3] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=64, message=Periodic update #64, timestamp=2025-07-09T21:00:54.885572900}
+2025-07-09 21:01:04 [MessageBroker-16] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=65, message=Periodic update #65, timestamp=2025-07-09T21:01:04.881458300}
+2025-07-09 21:01:14 [MessageBroker-16] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=66, message=Periodic update #66, timestamp=2025-07-09T21:01:14.886221200}
+2025-07-09 21:01:24 [MessageBroker-16] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=67, message=Periodic update #67, timestamp=2025-07-09T21:01:24.884223500}
+2025-07-09 21:01:34 [MessageBroker-9] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=68, message=Periodic update #68, timestamp=2025-07-09T21:01:34.882267500}
+2025-07-09 21:01:44 [MessageBroker-9] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=69, message=Periodic update #69, timestamp=2025-07-09T21:01:44.884189800}
+2025-07-09 21:01:54 [MessageBroker-9] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=70, message=Periodic update #70, timestamp=2025-07-09T21:01:54.883610200}
+2025-07-09 21:02:04 [MessageBroker-14] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=71, message=Periodic update #71, timestamp=2025-07-09T21:02:04.881342200}
+2025-07-09 21:02:14 [MessageBroker-14] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=72, message=Periodic update #72, timestamp=2025-07-09T21:02:14.889165800}
+2025-07-09 21:02:24 [MessageBroker-14] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=73, message=Periodic update #73, timestamp=2025-07-09T21:02:24.896053900}
+2025-07-09 21:02:34 [MessageBroker-1] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=74, message=Periodic update #74, timestamp=2025-07-09T21:02:34.880101500}
+2025-07-09 21:02:44 [MessageBroker-1] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=75, message=Periodic update #75, timestamp=2025-07-09T21:02:44.883123100}
+2025-07-09 21:02:51 [http-nio-8080-exec-8] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 21:02:51 [http-nio-8080-exec-8] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT * FROM users WHERE username = ?]
+2025-07-09 21:02:54 [MessageBroker-1] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=76, message=Periodic update #76, timestamp=2025-07-09T21:02:54.881312500}
+2025-07-09 21:02:56 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-07-09 21:02:56 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2025-07-09 21:02:56 [SpringApplicationShutdownHook] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopping...
+2025-07-09 21:02:56 [SpringApplicationShutdownHook] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@7ead0b51]]
+2025-07-09 21:02:56 [SpringApplicationShutdownHook] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopped.
+2025-07-09 21:02:58 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-07-09 21:02:58 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-07-09 21:02:58 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-07-09 21:04:22 [main] INFO  c.t.Trading212.Trading212Application - Starting Trading212Application using Java 23 with PID 3904 (C:\Users\GGSwiftPro\Desktop\Trading212\target\classes started by GGSwiftPro in C:\Users\GGSwiftPro\Desktop\Trading212)
+2025-07-09 21:04:22 [main] DEBUG c.t.Trading212.Trading212Application - Running with Spring Boot v3.5.3, Spring v6.2.8
+2025-07-09 21:04:22 [main] INFO  c.t.Trading212.Trading212Application - No active profile set, falling back to 1 default profile: "default"
+2025-07-09 21:04:23 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2025-07-09 21:04:23 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JDBC repositories in DEFAULT mode.
+2025-07-09 21:04:23 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 17 ms. Found 0 JDBC repository interfaces.
+2025-07-09 21:04:23 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2025-07-09 21:04:23 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-07-09 21:04:23 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 5 ms. Found 0 JPA repository interfaces.
+2025-07-09 21:04:24 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2025-07-09 21:04:24 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-07-09 21:04:24 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.42]
+2025-07-09 21:04:24 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-07-09 21:04:24 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2042 ms
+2025-07-09 21:04:24 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-07-09 21:04:24 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@6ffd4c0d
+2025-07-09 21:04:24 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-07-09 21:04:24 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-07-09 21:04:24 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.18.Final
+2025-07-09 21:04:25 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2025-07-09 21:04:25 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-07-09 21:04:25 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-07-09 21:04:25 [main] WARN  org.hibernate.orm.deprecation - HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-07-09 21:04:25 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-07-09 21:04:25 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-07-09 21:04:25 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-07-09 21:04:26 [main] INFO  c.t.Trading212.service.CryptoService - Starting cryptocurrency data initialization...
+2025-07-09 21:04:26 [main] INFO  c.t.T.repository.CryptoRepository - Checking if table cryptocurrencies exists...
+2025-07-09 21:04:26 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 21:04:26 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?]
+2025-07-09 21:04:26 [main] INFO  c.t.T.repository.CryptoRepository - Table cryptocurrencies exists in information_schema
+2025-07-09 21:04:26 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing SQL query [SELECT 1 FROM cryptocurrencies LIMIT 1]
+2025-07-09 21:04:26 [main] INFO  c.t.T.repository.CryptoRepository - Successfully queried table cryptocurrencies
+2025-07-09 21:04:26 [main] INFO  c.t.T.repository.CryptoRepository - Fetching up to 1000 cryptocurrencies starting from offset 0...
+2025-07-09 21:04:26 [main] INFO  c.t.T.repository.CryptoRepository - Checking if table cryptocurrencies exists...
+2025-07-09 21:04:26 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 21:04:26 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?]
+2025-07-09 21:04:26 [main] INFO  c.t.T.repository.CryptoRepository - Table cryptocurrencies exists in information_schema
+2025-07-09 21:04:26 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing SQL query [SELECT 1 FROM cryptocurrencies LIMIT 1]
+2025-07-09 21:04:26 [main] INFO  c.t.T.repository.CryptoRepository - Successfully queried table cryptocurrencies
+2025-07-09 21:04:26 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing SQL query [SELECT COUNT(*) FROM cryptocurrencies]
+2025-07-09 21:04:26 [main] INFO  c.t.T.repository.CryptoRepository - Found 23 total cryptocurrency records in the database
+2025-07-09 21:04:26 [main] DEBUG c.t.T.repository.CryptoRepository - Executing query: SELECT id, symbol, name, kraken_pair_name, current_price, last_updated
+FROM cryptocurrencies
+ORDER BY symbol
+LIMIT ? OFFSET ?
+ with limit=1000, offset=0
+2025-07-09 21:04:26 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 21:04:26 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT id, symbol, name, kraken_pair_name, current_price, last_updated
+FROM cryptocurrencies
+ORDER BY symbol
+LIMIT ? OFFSET ?
+]
+2025-07-09 21:04:26 [main] INFO  c.t.T.repository.CryptoRepository - Retrieved 23 cryptocurrency records (showing first 3): [ADA ($0.58), ATOM ($4.05), AVAX ($0.00)]
+2025-07-09 21:04:26 [main] INFO  c.t.Trading212.service.CryptoService - Initialized 20 cryptocurrencies
+2025-07-09 21:04:26 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 21:04:26 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT * FROM users WHERE username = ?]
+2025-07-09 21:04:26 [main] INFO  c.t.Trading212.service.UserService - Default user already exists.
+2025-07-09 21:04:26 [main] INFO  c.t.T.s.W.KrakenWebSocketClient - Initializing Kraken WebSocket client...
+2025-07-09 21:04:26 [main] INFO  c.t.T.s.W.KrakenWebSocketClient - Attempting to connect to Kraken WebSocket API at: wss://ws.kraken.com/
+2025-07-09 21:04:26 [main] INFO  c.t.T.s.W.KrakenWebSocketClient - Subscribing to pairs: [XBT/USD, ETH/USD, ADA/USD, XRP/USD, LTC/USD, BCH/USD, DOT/USD, LINK/USD, SOL/USD, UNI/USD, DOGE/USD, TRX/USD, ETC/USD, XLM/USD, EOS/USD, XTZ/USD, ATOM/USD, FIL/USD]
+2025-07-09 21:04:26 [main] INFO  c.t.T.s.W.KrakenWebSocketClient - Creating new WebSocket connection to: wss://ws.kraken.com/
+2025-07-09 21:04:26 [main] INFO  c.t.T.s.W.KrakenWebSocketClient - Waiting for WebSocket connection to be established...
+2025-07-09 21:04:28 [ForkJoinPool.commonPool-worker-1] INFO  c.t.T.s.W.KrakenWebSocketClient - WebSocket connection opened successfully to Kraken API
+2025-07-09 21:04:28 [ForkJoinPool.commonPool-worker-1] DEBUG c.t.T.s.W.KrakenWebSocketClient - Sending subscribe message: {"event":"subscribe","subscription":{"name":"ticker"},"pair":["XBT/USD","ETH/USD","ADA/USD","XRP/USD","LTC/USD","BCH/USD","DOT/USD","LINK/USD","SOL/USD","UNI/USD","DOGE/USD","TRX/USD","ETC/USD","XLM/USD","EOS/USD","XTZ/USD","ATOM/USD","FIL/USD"]}
+2025-07-09 21:04:28 [ForkJoinPool.commonPool-worker-1] INFO  c.t.T.s.W.KrakenWebSocketClient - Subscription message sent for 18 pairs
+2025-07-09 21:04:28 [ForkJoinPool.commonPool-worker-1] INFO  c.t.T.s.W.KrakenWebSocketClient - WebSocket connection future completed
+2025-07-09 21:04:28 [main] INFO  c.t.T.s.W.KrakenWebSocketClient - WebSocket connection established and ready for use
+2025-07-09 21:04:28 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-07-09 21:04:28 [main] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2025-07-09 21:04:29 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Starting...
+2025-07-09 21:04:29 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@2ad80cf6]]
+2025-07-09 21:04:29 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Started.
+2025-07-09 21:04:29 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2025-07-09 21:04:29 [main] INFO  c.t.Trading212.Trading212Application - Started Trading212Application in 7.671 seconds (process running for 8.275)
+2025-07-09 21:04:29 [MessageBroker-2] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=1, message=Periodic update #1, timestamp=2025-07-09T21:04:29.172818600}
+2025-07-09 21:04:33 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-07-09 21:04:33 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-07-09 21:04:33 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2025-07-09 21:04:33 [http-nio-8080-exec-2] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 21:04:33 [http-nio-8080-exec-2] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT * FROM users WHERE username = ?]
+2025-07-09 21:04:39 [MessageBroker-3] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=2, message=Periodic update #2, timestamp=2025-07-09T21:04:39.168363}
+2025-07-09 21:04:49 [MessageBroker-4] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=3, message=Periodic update #3, timestamp=2025-07-09T21:04:49.173635800}
+2025-07-09 21:04:59 [MessageBroker-5] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=4, message=Periodic update #4, timestamp=2025-07-09T21:04:59.163037700}
+2025-07-09 21:05:09 [MessageBroker-3] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=5, message=Periodic update #5, timestamp=2025-07-09T21:05:09.167314100}
+2025-07-09 21:05:19 [MessageBroker-2] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=6, message=Periodic update #6, timestamp=2025-07-09T21:05:19.162750200}
+2025-07-09 21:05:29 [MessageBroker-6] INFO  o.s.w.s.c.WebSocketMessageBrokerStats - WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 10, active threads = 1, queued tasks = 2, completed tasks = 7]
+2025-07-09 21:05:29 [MessageBroker-4] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=7, message=Periodic update #7, timestamp=2025-07-09T21:05:29.161198800}
+2025-07-09 21:05:39 [MessageBroker-5] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=8, message=Periodic update #8, timestamp=2025-07-09T21:05:39.170051}
+2025-07-09 21:05:49 [MessageBroker-3] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=9, message=Periodic update #9, timestamp=2025-07-09T21:05:49.172054700}
+2025-07-09 21:05:59 [MessageBroker-2] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=10, message=Periodic update #10, timestamp=2025-07-09T21:05:59.173809800}
+2025-07-09 21:06:09 [MessageBroker-1] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=11, message=Periodic update #11, timestamp=2025-07-09T21:06:09.164003500}
+2025-07-09 21:06:19 [MessageBroker-11] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=12, message=Periodic update #12, timestamp=2025-07-09T21:06:19.171421700}
+2025-07-09 21:06:29 [MessageBroker-11] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=13, message=Periodic update #13, timestamp=2025-07-09T21:06:29.164972200}
+2025-07-09 21:06:39 [MessageBroker-11] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=14, message=Periodic update #14, timestamp=2025-07-09T21:06:39.166351200}
+2025-07-09 21:06:49 [MessageBroker-11] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=15, message=Periodic update #15, timestamp=2025-07-09T21:06:49.161388500}
+2025-07-09 21:06:59 [MessageBroker-11] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=16, message=Periodic update #16, timestamp=2025-07-09T21:06:59.167316100}
+2025-07-09 21:07:09 [MessageBroker-11] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=17, message=Periodic update #17, timestamp=2025-07-09T21:07:09.170882600}
+2025-07-09 21:07:19 [MessageBroker-11] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=18, message=Periodic update #18, timestamp=2025-07-09T21:07:19.162711100}
+2025-07-09 21:07:29 [MessageBroker-11] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=19, message=Periodic update #19, timestamp=2025-07-09T21:07:29.162734400}
+2025-07-09 21:07:38 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-07-09 21:07:38 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2025-07-09 21:07:38 [SpringApplicationShutdownHook] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopping...
+2025-07-09 21:07:38 [SpringApplicationShutdownHook] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@2ad80cf6]]
+2025-07-09 21:07:38 [SpringApplicationShutdownHook] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopped.
+2025-07-09 21:07:39 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-07-09 21:07:39 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-07-09 21:07:39 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-07-09 21:07:41 [main] INFO  c.t.Trading212.Trading212Application - Starting Trading212Application using Java 23 with PID 21420 (C:\Users\GGSwiftPro\Desktop\Trading212\target\classes started by GGSwiftPro in C:\Users\GGSwiftPro\Desktop\Trading212)
+2025-07-09 21:07:41 [main] DEBUG c.t.Trading212.Trading212Application - Running with Spring Boot v3.5.3, Spring v6.2.8
+2025-07-09 21:07:41 [main] INFO  c.t.Trading212.Trading212Application - No active profile set, falling back to 1 default profile: "default"
+2025-07-09 21:07:42 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2025-07-09 21:07:42 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JDBC repositories in DEFAULT mode.
+2025-07-09 21:07:42 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 18 ms. Found 0 JDBC repository interfaces.
+2025-07-09 21:07:42 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2025-07-09 21:07:42 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-07-09 21:07:42 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 6 ms. Found 0 JPA repository interfaces.
+2025-07-09 21:07:43 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2025-07-09 21:07:43 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-07-09 21:07:43 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.42]
+2025-07-09 21:07:43 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-07-09 21:07:43 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1933 ms
+2025-07-09 21:07:43 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-07-09 21:07:44 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@6221b13b
+2025-07-09 21:07:44 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-07-09 21:07:44 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-07-09 21:07:44 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.18.Final
+2025-07-09 21:07:44 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2025-07-09 21:07:44 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-07-09 21:07:44 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-07-09 21:07:44 [main] WARN  org.hibernate.orm.deprecation - HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-07-09 21:07:44 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-07-09 21:07:45 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-07-09 21:07:45 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-07-09 21:07:45 [main] INFO  c.t.Trading212.service.CryptoService - Starting cryptocurrency data initialization...
+2025-07-09 21:07:45 [main] INFO  c.t.T.repository.CryptoRepository - Checking if table cryptocurrencies exists...
+2025-07-09 21:07:45 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 21:07:45 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?]
+2025-07-09 21:07:45 [main] INFO  c.t.T.repository.CryptoRepository - Table cryptocurrencies exists in information_schema
+2025-07-09 21:07:45 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing SQL query [SELECT 1 FROM cryptocurrencies LIMIT 1]
+2025-07-09 21:07:45 [main] INFO  c.t.T.repository.CryptoRepository - Successfully queried table cryptocurrencies
+2025-07-09 21:07:45 [main] INFO  c.t.T.repository.CryptoRepository - Fetching up to 1000 cryptocurrencies starting from offset 0...
+2025-07-09 21:07:45 [main] INFO  c.t.T.repository.CryptoRepository - Checking if table cryptocurrencies exists...
+2025-07-09 21:07:45 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 21:07:45 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?]
+2025-07-09 21:07:45 [main] INFO  c.t.T.repository.CryptoRepository - Table cryptocurrencies exists in information_schema
+2025-07-09 21:07:45 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing SQL query [SELECT 1 FROM cryptocurrencies LIMIT 1]
+2025-07-09 21:07:45 [main] INFO  c.t.T.repository.CryptoRepository - Successfully queried table cryptocurrencies
+2025-07-09 21:07:45 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing SQL query [SELECT COUNT(*) FROM cryptocurrencies]
+2025-07-09 21:07:45 [main] INFO  c.t.T.repository.CryptoRepository - Found 23 total cryptocurrency records in the database
+2025-07-09 21:07:45 [main] DEBUG c.t.T.repository.CryptoRepository - Executing query: SELECT id, symbol, name, kraken_pair_name, current_price, last_updated
+FROM cryptocurrencies
+ORDER BY symbol
+LIMIT ? OFFSET ?
+ with limit=1000, offset=0
+2025-07-09 21:07:45 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 21:07:45 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT id, symbol, name, kraken_pair_name, current_price, last_updated
+FROM cryptocurrencies
+ORDER BY symbol
+LIMIT ? OFFSET ?
+]
+2025-07-09 21:07:45 [main] INFO  c.t.T.repository.CryptoRepository - Retrieved 23 cryptocurrency records (showing first 3): [ADA ($0.58), ATOM ($4.05), AVAX ($0.00)]
+2025-07-09 21:07:45 [main] INFO  c.t.Trading212.service.CryptoService - Initialized 20 cryptocurrencies
+2025-07-09 21:07:45 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 21:07:45 [main] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT * FROM users WHERE username = ?]
+2025-07-09 21:07:45 [main] INFO  c.t.Trading212.service.UserService - Default user already exists.
+2025-07-09 21:07:46 [main] INFO  c.t.T.s.W.KrakenWebSocketClient - Initializing Kraken WebSocket client...
+2025-07-09 21:07:46 [main] INFO  c.t.T.s.W.KrakenWebSocketClient - Attempting to connect to Kraken WebSocket API at: wss://ws.kraken.com/
+2025-07-09 21:07:46 [main] INFO  c.t.T.s.W.KrakenWebSocketClient - Subscribing to pairs: [XBT/USD, ETH/USD, ADA/USD, XRP/USD, LTC/USD, BCH/USD, DOT/USD, LINK/USD, SOL/USD, UNI/USD, DOGE/USD, TRX/USD, ETC/USD, XLM/USD, EOS/USD, XTZ/USD, ATOM/USD, FIL/USD]
+2025-07-09 21:07:46 [main] INFO  c.t.T.s.W.KrakenWebSocketClient - Creating new WebSocket connection to: wss://ws.kraken.com/
+2025-07-09 21:07:46 [main] INFO  c.t.T.s.W.KrakenWebSocketClient - Waiting for WebSocket connection to be established...
+2025-07-09 21:07:47 [ForkJoinPool.commonPool-worker-1] INFO  c.t.T.s.W.KrakenWebSocketClient - WebSocket connection opened successfully to Kraken API
+2025-07-09 21:07:47 [ForkJoinPool.commonPool-worker-1] DEBUG c.t.T.s.W.KrakenWebSocketClient - Sending subscribe message: {"event":"subscribe","subscription":{"name":"ticker"},"pair":["XBT/USD","ETH/USD","ADA/USD","XRP/USD","LTC/USD","BCH/USD","DOT/USD","LINK/USD","SOL/USD","UNI/USD","DOGE/USD","TRX/USD","ETC/USD","XLM/USD","EOS/USD","XTZ/USD","ATOM/USD","FIL/USD"]}
+2025-07-09 21:07:47 [ForkJoinPool.commonPool-worker-1] INFO  c.t.T.s.W.KrakenWebSocketClient - Subscription message sent for 18 pairs
+2025-07-09 21:07:47 [ForkJoinPool.commonPool-worker-1] INFO  c.t.T.s.W.KrakenWebSocketClient - WebSocket connection future completed
+2025-07-09 21:07:47 [main] INFO  c.t.T.s.W.KrakenWebSocketClient - WebSocket connection established and ready for use
+2025-07-09 21:07:47 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-07-09 21:07:47 [main] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2025-07-09 21:07:48 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Starting...
+2025-07-09 21:07:48 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@5b3c11ce]]
+2025-07-09 21:07:48 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Started.
+2025-07-09 21:07:48 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2025-07-09 21:07:48 [main] INFO  c.t.Trading212.Trading212Application - Started Trading212Application in 7.418 seconds (process running for 8.078)
+2025-07-09 21:07:48 [MessageBroker-2] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=1, message=Periodic update #1, timestamp=2025-07-09T21:07:48.482898900}
+2025-07-09 21:07:51 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-07-09 21:07:51 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-07-09 21:07:51 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2025-07-09 21:07:52 [http-nio-8080-exec-2] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 21:07:52 [http-nio-8080-exec-2] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT * FROM users WHERE username = ?]
+2025-07-09 21:07:58 [MessageBroker-3] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=2, message=Periodic update #2, timestamp=2025-07-09T21:07:58.477302700}
+2025-07-09 21:08:08 [MessageBroker-4] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=3, message=Periodic update #3, timestamp=2025-07-09T21:08:08.471774800}
+2025-07-09 21:08:18 [MessageBroker-5] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=4, message=Periodic update #4, timestamp=2025-07-09T21:08:18.474396}
+2025-07-09 21:08:28 [MessageBroker-3] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=0, counter=5, message=Periodic update #5, timestamp=2025-07-09T21:08:28.475526}
+2025-07-09 21:08:28 [http-nio-8080-exec-4] INFO  c.t.T.repository.CryptoRepository - Fetching up to 1000 cryptocurrencies starting from offset 0...
+2025-07-09 21:08:28 [http-nio-8080-exec-4] INFO  c.t.T.repository.CryptoRepository - Checking if table cryptocurrencies exists...
+2025-07-09 21:08:28 [http-nio-8080-exec-4] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 21:08:28 [http-nio-8080-exec-4] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?]
+2025-07-09 21:08:28 [http-nio-8080-exec-4] INFO  c.t.T.repository.CryptoRepository - Table cryptocurrencies exists in information_schema
+2025-07-09 21:08:28 [http-nio-8080-exec-4] DEBUG o.s.jdbc.core.JdbcTemplate - Executing SQL query [SELECT 1 FROM cryptocurrencies LIMIT 1]
+2025-07-09 21:08:28 [http-nio-8080-exec-4] INFO  c.t.T.repository.CryptoRepository - Successfully queried table cryptocurrencies
+2025-07-09 21:08:28 [http-nio-8080-exec-4] DEBUG o.s.jdbc.core.JdbcTemplate - Executing SQL query [SELECT COUNT(*) FROM cryptocurrencies]
+2025-07-09 21:08:28 [http-nio-8080-exec-4] INFO  c.t.T.repository.CryptoRepository - Found 23 total cryptocurrency records in the database
+2025-07-09 21:08:28 [http-nio-8080-exec-4] DEBUG c.t.T.repository.CryptoRepository - Executing query: SELECT id, symbol, name, kraken_pair_name, current_price, last_updated
+FROM cryptocurrencies
+ORDER BY symbol
+LIMIT ? OFFSET ?
+ with limit=1000, offset=0
+2025-07-09 21:08:28 [http-nio-8080-exec-4] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 21:08:28 [http-nio-8080-exec-4] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT id, symbol, name, kraken_pair_name, current_price, last_updated
+FROM cryptocurrencies
+ORDER BY symbol
+LIMIT ? OFFSET ?
+]
+2025-07-09 21:08:28 [http-nio-8080-exec-4] INFO  c.t.T.repository.CryptoRepository - Retrieved 23 cryptocurrency records (showing first 3): [ADA ($0.58), ATOM ($4.05), AVAX ($0.00)]
+2025-07-09 21:08:28 [http-nio-8080-exec-6] INFO  c.t.T.c.WebSocketLoggingInterceptor - WebSocket connection attempt from: /[0:0:0:0:0:0:0:1]:12341 [Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0]
+2025-07-09 21:08:28 [http-nio-8080-exec-6] DEBUG c.t.T.c.WebSocketLoggingInterceptor - WebSocket Headers: [host:"localhost:8080", connection:"Upgrade", pragma:"no-cache", cache-control:"no-cache", user-agent:"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0", upgrade:"websocket", origin:"http://localhost:8080", sec-websocket-version:"13", accept-encoding:"gzip, deflate, br, zstd", accept-language:"en-US,en;q=0.9", sec-websocket-key:"TmwKDtpx26xDiGvtqtGGQQ==", sec-websocket-extensions:"permessage-deflate; client_max_window_bits"]
+2025-07-09 21:08:28 [http-nio-8080-exec-6] INFO  c.t.T.c.WebSocketLoggingInterceptor - WebSocket connection established: /[0:0:0:0:0:0:0:1]:12341
+2025-07-09 21:08:28 [http-nio-8080-exec-8] INFO  c.t.T.c.WebSocketLoggingInterceptor - WebSocket connection attempt from: /[0:0:0:0:0:0:0:1]:12342 [Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0]
+2025-07-09 21:08:28 [http-nio-8080-exec-8] DEBUG c.t.T.c.WebSocketLoggingInterceptor - WebSocket Headers: [host:"localhost:8080", connection:"Upgrade", pragma:"no-cache", cache-control:"no-cache", user-agent:"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0", upgrade:"websocket", origin:"http://localhost:8080", sec-websocket-version:"13", accept-encoding:"gzip, deflate, br, zstd", accept-language:"en-US,en;q=0.9", sec-websocket-key:"z0fdkT9G9HE9GrrxOlK/gw==", sec-websocket-extensions:"permessage-deflate; client_max_window_bits"]
+2025-07-09 21:08:28 [http-nio-8080-exec-8] INFO  c.t.T.c.WebSocketLoggingInterceptor - WebSocket connection established: /[0:0:0:0:0:0:0:1]:12342
+2025-07-09 21:08:28 [http-nio-8080-exec-9] DEBUG c.t.Trading212.util.WebSocketUtils - INBOUND Command: CONNECT, Session: w4weggdt, Headers: {simpMessageType=CONNECT, stompCommand=CONNECT, nativeHeaders={heart-beat=[10000,10000], accept-version=[1.1,1.0], host=[localhost:8080]}, simpSessionAttributes={}, simpHeartbeat=[J@7e642b91, simpSessionId=w4weggdt}
+2025-07-09 21:08:28 [http-nio-8080-exec-10] DEBUG c.t.Trading212.util.WebSocketUtils - INBOUND Command: CONNECT, Session: fdswzrif, Headers: {simpMessageType=CONNECT, stompCommand=CONNECT, nativeHeaders={heart-beat=[10000,10000], accept-version=[1.1,1.0], host=[localhost:8080]}, simpSessionAttributes={}, simpHeartbeat=[J@17646c1b, simpSessionId=fdswzrif}
+2025-07-09 21:08:28 [clientOutboundChannel-2] INFO  c.t.T.c.WebSocketTestController - New WebSocket connection: session=w4weggdt, user=anonymous, total=2
+2025-07-09 21:08:28 [clientOutboundChannel-1] INFO  c.t.T.c.WebSocketTestController - New WebSocket connection: session=fdswzrif, user=anonymous, total=2
+2025-07-09 21:08:28 [clientOutboundChannel-1] INFO  c.t.T.l.WebSocketEventListener - WebSocket connection established - Session ID: fdswzrif
+2025-07-09 21:08:28 [clientOutboundChannel-2] INFO  c.t.T.l.WebSocketEventListener - WebSocket connection established - Session ID: w4weggdt
+2025-07-09 21:08:28 [http-nio-8080-exec-1] DEBUG c.t.Trading212.util.WebSocketUtils - INBOUND Command: SUBSCRIBE, Session: w4weggdt, Destination: /topic/prices, Subscription: sub-0, Headers: {simpMessageType=SUBSCRIBE, stompCommand=SUBSCRIBE, nativeHeaders={id=[sub-0], destination=[/topic/prices]}, simpSessionAttributes={}, simpHeartbeat=[J@29556cda, simpSubscriptionId=sub-0, simpSessionId=w4weggdt, simpDestination=/topic/prices}
+2025-07-09 21:08:28 [http-nio-8080-exec-1] INFO  c.t.T.l.WebSocketEventListener - New subscription - Session: unknown, Destination: /topic/prices
+2025-07-09 21:08:28 [http-nio-8080-exec-1] DEBUG c.t.Trading212.util.WebSocketUtils - INBOUND Command: SUBSCRIBE, Session: w4weggdt, Destination: /topic/updates, Subscription: sub-1, Headers: {simpMessageType=SUBSCRIBE, stompCommand=SUBSCRIBE, nativeHeaders={id=[sub-1], destination=[/topic/updates]}, simpSessionAttributes={}, simpHeartbeat=[J@1444952f, simpSubscriptionId=sub-1, simpSessionId=w4weggdt, simpDestination=/topic/updates}
+2025-07-09 21:08:28 [http-nio-8080-exec-1] INFO  c.t.T.l.WebSocketEventListener - New subscription - Session: unknown, Destination: /topic/updates
+2025-07-09 21:08:28 [http-nio-8080-exec-1] DEBUG c.t.Trading212.util.WebSocketUtils - INBOUND Command: SUBSCRIBE, Session: w4weggdt, Destination: /topic/broadcast, Subscription: sub-2, Headers: {simpMessageType=SUBSCRIBE, stompCommand=SUBSCRIBE, nativeHeaders={id=[sub-2], destination=[/topic/broadcast]}, simpSessionAttributes={}, simpHeartbeat=[J@28b3ba60, simpSubscriptionId=sub-2, simpSessionId=w4weggdt, simpDestination=/topic/broadcast}
+2025-07-09 21:08:28 [http-nio-8080-exec-1] INFO  c.t.T.l.WebSocketEventListener - New subscription - Session: unknown, Destination: /topic/broadcast
+2025-07-09 21:08:28 [http-nio-8080-exec-1] DEBUG c.t.Trading212.util.WebSocketUtils - INBOUND Command: SUBSCRIBE, Session: w4weggdt, Destination: /user/queue/notifications, Subscription: sub-3, Headers: {simpMessageType=SUBSCRIBE, stompCommand=SUBSCRIBE, nativeHeaders={id=[sub-3], destination=[/user/queue/notifications]}, simpSessionAttributes={}, simpHeartbeat=[J@243e4950, simpSubscriptionId=sub-3, simpSessionId=w4weggdt, simpDestination=/user/queue/notifications}
+2025-07-09 21:08:28 [http-nio-8080-exec-1] INFO  c.t.T.l.WebSocketEventListener - New subscription - Session: unknown, Destination: /user/queue/notifications
+2025-07-09 21:08:28 [http-nio-8080-exec-1] ERROR o.s.w.s.m.StompSubProtocolHandler - Failed to parse TextMessage payload=[SEND
+desti..], byteCount=394, last=true] in session w4weggdt. Sending STOMP ERROR to client.
+org.springframework.messaging.simp.stomp.StompConversionException: Illegal escape sequence at index 54: {"destination":"/app/test/echo","headers":{},"body":"{\"action\":\"connection_test\",\"timestamp\":\"2025-07-09T18:08:28.814Z\",\"clientInfo\":{\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0\",\"timezone\":\"Europe/Kiev\",\"screenResolution\":\"1920x1080\"}}"}
+	at org.springframework.messaging.simp.stomp.StompDecoder.unescape(StompDecoder.java:295)
+	at org.springframework.messaging.simp.stomp.StompDecoder.readHeaders(StompDecoder.java:246)
+	at org.springframework.messaging.simp.stomp.StompDecoder.decodeMessage(StompDecoder.java:147)
+	at org.springframework.messaging.simp.stomp.StompDecoder.decode(StompDecoder.java:114)
+	at org.springframework.messaging.simp.stomp.BufferingStompDecoder.decode(BufferingStompDecoder.java:112)
+	at org.springframework.web.socket.messaging.StompSubProtocolHandler.handleMessageFromClient(StompSubProtocolHandler.java:279)
+	at org.springframework.web.socket.messaging.SubProtocolWebSocketHandler.handleMessage(SubProtocolWebSocketHandler.java:357)
+	at org.springframework.web.socket.handler.WebSocketHandlerDecorator.handleMessage(WebSocketHandlerDecorator.java:75)
+	at org.springframework.web.socket.handler.LoggingWebSocketHandlerDecorator.handleMessage(LoggingWebSocketHandlerDecorator.java:56)
+	at org.springframework.web.socket.handler.ExceptionWebSocketHandlerDecorator.handleMessage(ExceptionWebSocketHandlerDecorator.java:58)
+	at org.springframework.web.socket.sockjs.transport.session.AbstractSockJsSession.delegateMessages(AbstractSockJsSession.java:346)
+	at org.springframework.web.socket.sockjs.transport.session.WebSocketServerSockJsSession.handleMessage(WebSocketServerSockJsSession.java:199)
+	at org.springframework.web.socket.sockjs.transport.handler.SockJsWebSocketHandler.handleTextMessage(SockJsWebSocketHandler.java:93)
+	at org.springframework.web.socket.handler.AbstractWebSocketHandler.handleMessage(AbstractWebSocketHandler.java:43)
+	at org.springframework.web.socket.adapter.standard.StandardWebSocketHandlerAdapter.handleTextMessage(StandardWebSocketHandlerAdapter.java:113)
+	at org.springframework.web.socket.adapter.standard.StandardWebSocketHandlerAdapter$3.onMessage(StandardWebSocketHandlerAdapter.java:84)
+	at org.springframework.web.socket.adapter.standard.StandardWebSocketHandlerAdapter$3.onMessage(StandardWebSocketHandlerAdapter.java:81)
+	at org.apache.tomcat.websocket.WsFrameBase.sendMessageText(WsFrameBase.java:389)
+	at org.apache.tomcat.websocket.server.WsFrameServer.sendMessageText(WsFrameServer.java:130)
+	at org.apache.tomcat.websocket.WsFrameBase.processDataText(WsFrameBase.java:483)
+	at org.apache.tomcat.websocket.WsFrameBase.processData(WsFrameBase.java:283)
+	at org.apache.tomcat.websocket.WsFrameBase.processInputBuffer(WsFrameBase.java:129)
+	at org.apache.tomcat.websocket.server.WsFrameServer.onDataAvailable(WsFrameServer.java:85)
+	at org.apache.tomcat.websocket.server.WsFrameServer.doOnDataAvailable(WsFrameServer.java:184)
+	at org.apache.tomcat.websocket.server.WsFrameServer.notifyDataAvailable(WsFrameServer.java:164)
+	at org.apache.tomcat.websocket.server.WsHttpUpgradeHandler.upgradeDispatch(WsHttpUpgradeHandler.java:152)
+	at org.apache.coyote.http11.upgrade.UpgradeProcessorInternal.dispatch(UpgradeProcessorInternal.java:60)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:57)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1769)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1189)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:658)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:1575)
+2025-07-09 21:08:28 [http-nio-8080-exec-1] INFO  c.t.T.c.WebSocketTestController - WebSocket disconnected: session=w4weggdt, user=anonymous, remaining=1
+2025-07-09 21:08:28 [http-nio-8080-exec-1] INFO  c.t.T.l.WebSocketEventListener - WebSocket connection closed - Session ID: w4weggdt
+2025-07-09 21:08:28 [http-nio-8080-exec-1] DEBUG c.t.Trading212.util.WebSocketUtils - INBOUND Command: DISCONNECT, Session: w4weggdt, Payload Type: byte[]
+2025-07-09 21:08:29 [http-nio-8080-exec-2] INFO  c.t.T.repository.CryptoRepository - Fetching up to 1000 cryptocurrencies starting from offset 0...
+2025-07-09 21:08:29 [http-nio-8080-exec-2] INFO  c.t.T.repository.CryptoRepository - Checking if table cryptocurrencies exists...
+2025-07-09 21:08:29 [http-nio-8080-exec-2] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 21:08:29 [http-nio-8080-exec-2] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?]
+2025-07-09 21:08:29 [http-nio-8080-exec-2] INFO  c.t.T.repository.CryptoRepository - Table cryptocurrencies exists in information_schema
+2025-07-09 21:08:29 [http-nio-8080-exec-2] DEBUG o.s.jdbc.core.JdbcTemplate - Executing SQL query [SELECT 1 FROM cryptocurrencies LIMIT 1]
+2025-07-09 21:08:29 [http-nio-8080-exec-2] INFO  c.t.T.repository.CryptoRepository - Successfully queried table cryptocurrencies
+2025-07-09 21:08:29 [http-nio-8080-exec-2] DEBUG o.s.jdbc.core.JdbcTemplate - Executing SQL query [SELECT COUNT(*) FROM cryptocurrencies]
+2025-07-09 21:08:29 [http-nio-8080-exec-2] INFO  c.t.T.repository.CryptoRepository - Found 23 total cryptocurrency records in the database
+2025-07-09 21:08:29 [http-nio-8080-exec-2] DEBUG c.t.T.repository.CryptoRepository - Executing query: SELECT id, symbol, name, kraken_pair_name, current_price, last_updated
+FROM cryptocurrencies
+ORDER BY symbol
+LIMIT ? OFFSET ?
+ with limit=1000, offset=0
+2025-07-09 21:08:29 [http-nio-8080-exec-2] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 21:08:29 [http-nio-8080-exec-2] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT id, symbol, name, kraken_pair_name, current_price, last_updated
+FROM cryptocurrencies
+ORDER BY symbol
+LIMIT ? OFFSET ?
+]
+2025-07-09 21:08:29 [http-nio-8080-exec-2] INFO  c.t.T.repository.CryptoRepository - Retrieved 23 cryptocurrency records (showing first 3): [ADA ($0.58), ATOM ($4.05), AVAX ($0.00)]
+2025-07-09 21:08:29 [http-nio-8080-exec-3] INFO  c.t.T.repository.CryptoRepository - Fetching up to 1000 cryptocurrencies starting from offset 0...
+2025-07-09 21:08:29 [http-nio-8080-exec-3] INFO  c.t.T.repository.CryptoRepository - Checking if table cryptocurrencies exists...
+2025-07-09 21:08:29 [http-nio-8080-exec-3] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 21:08:29 [http-nio-8080-exec-3] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?]
+2025-07-09 21:08:29 [http-nio-8080-exec-3] INFO  c.t.T.repository.CryptoRepository - Table cryptocurrencies exists in information_schema
+2025-07-09 21:08:29 [http-nio-8080-exec-3] DEBUG o.s.jdbc.core.JdbcTemplate - Executing SQL query [SELECT 1 FROM cryptocurrencies LIMIT 1]
+2025-07-09 21:08:29 [http-nio-8080-exec-3] INFO  c.t.T.repository.CryptoRepository - Successfully queried table cryptocurrencies
+2025-07-09 21:08:29 [http-nio-8080-exec-3] DEBUG o.s.jdbc.core.JdbcTemplate - Executing SQL query [SELECT COUNT(*) FROM cryptocurrencies]
+2025-07-09 21:08:29 [http-nio-8080-exec-3] INFO  c.t.T.repository.CryptoRepository - Found 23 total cryptocurrency records in the database
+2025-07-09 21:08:29 [http-nio-8080-exec-3] DEBUG c.t.T.repository.CryptoRepository - Executing query: SELECT id, symbol, name, kraken_pair_name, current_price, last_updated
+FROM cryptocurrencies
+ORDER BY symbol
+LIMIT ? OFFSET ?
+ with limit=1000, offset=0
+2025-07-09 21:08:29 [http-nio-8080-exec-3] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL query
+2025-07-09 21:08:29 [http-nio-8080-exec-3] DEBUG o.s.jdbc.core.JdbcTemplate - Executing prepared SQL statement [SELECT id, symbol, name, kraken_pair_name, current_price, last_updated
+FROM cryptocurrencies
+ORDER BY symbol
+LIMIT ? OFFSET ?
+]
+2025-07-09 21:08:29 [http-nio-8080-exec-3] INFO  c.t.T.repository.CryptoRepository - Retrieved 23 cryptocurrency records (showing first 3): [ADA ($0.58), ATOM ($4.05), AVAX ($0.00)]
+2025-07-09 21:08:33 [http-nio-8080-exec-7] INFO  c.t.T.c.WebSocketLoggingInterceptor - WebSocket connection attempt from: /[0:0:0:0:0:0:0:1]:12357 [Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0]
+2025-07-09 21:08:33 [http-nio-8080-exec-7] DEBUG c.t.T.c.WebSocketLoggingInterceptor - WebSocket Headers: [host:"localhost:8080", connection:"Upgrade", pragma:"no-cache", cache-control:"no-cache", user-agent:"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0", upgrade:"websocket", origin:"http://localhost:8080", sec-websocket-version:"13", accept-encoding:"gzip, deflate, br, zstd", accept-language:"en-US,en;q=0.9", sec-websocket-key:"dtTC/gFP5NhfRNOL4lNo9Q==", sec-websocket-extensions:"permessage-deflate; client_max_window_bits"]
+2025-07-09 21:08:33 [http-nio-8080-exec-7] INFO  c.t.T.c.WebSocketLoggingInterceptor - WebSocket connection established: /[0:0:0:0:0:0:0:1]:12357
+2025-07-09 21:08:33 [http-nio-8080-exec-8] DEBUG c.t.Trading212.util.WebSocketUtils - INBOUND Command: CONNECT, Session: iuwji5po, Headers: {simpMessageType=CONNECT, stompCommand=CONNECT, nativeHeaders={heart-beat=[10000,10000], accept-version=[1.1,1.0], host=[localhost:8080]}, simpSessionAttributes={}, simpHeartbeat=[J@34fba83b, simpSessionId=iuwji5po}
+2025-07-09 21:08:33 [clientOutboundChannel-4] INFO  c.t.T.c.WebSocketTestController - New WebSocket connection: session=iuwji5po, user=anonymous, total=2
+2025-07-09 21:08:33 [clientOutboundChannel-4] INFO  c.t.T.l.WebSocketEventListener - WebSocket connection established - Session ID: iuwji5po
+2025-07-09 21:08:38 [MessageBroker-7] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=2, counter=6, message=Periodic update #6, timestamp=2025-07-09T21:08:38.471429500}
+2025-07-09 21:08:38 [http-nio-8080-exec-9] DEBUG c.t.Trading212.util.WebSocketUtils - INBOUND Command: DISCONNECT, Session: iuwji5po, Payload Type: byte[]
+2025-07-09 21:08:38 [http-nio-8080-exec-9] INFO  c.t.T.c.WebSocketTestController - WebSocket disconnected: session=iuwji5po, user=anonymous, remaining=1
+2025-07-09 21:08:38 [http-nio-8080-exec-9] INFO  c.t.T.l.WebSocketEventListener - WebSocket connection closed - Session ID: iuwji5po
+2025-07-09 21:08:38 [http-nio-8080-exec-9] DEBUG c.t.Trading212.util.WebSocketUtils - INBOUND Command: DISCONNECT, Session: iuwji5po, Payload Type: byte[]
+2025-07-09 21:08:38 [http-nio-8080-exec-1] INFO  c.t.T.c.WebSocketLoggingInterceptor - WebSocket connection attempt from: /[0:0:0:0:0:0:0:1]:12368 [Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0]
+2025-07-09 21:08:38 [http-nio-8080-exec-1] DEBUG c.t.T.c.WebSocketLoggingInterceptor - WebSocket Headers: [host:"localhost:8080", connection:"Upgrade", pragma:"no-cache", cache-control:"no-cache", user-agent:"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0", upgrade:"websocket", origin:"http://localhost:8080", sec-websocket-version:"13", accept-encoding:"gzip, deflate, br, zstd", accept-language:"en-US,en;q=0.9", sec-websocket-key:"fQp5Prr1Huq4MecTwLxsaQ==", sec-websocket-extensions:"permessage-deflate; client_max_window_bits"]
+2025-07-09 21:08:38 [http-nio-8080-exec-1] INFO  c.t.T.c.WebSocketLoggingInterceptor - WebSocket connection established: /[0:0:0:0:0:0:0:1]:12368
+2025-07-09 21:08:38 [http-nio-8080-exec-4] DEBUG c.t.Trading212.util.WebSocketUtils - INBOUND Command: CONNECT, Session: jxk10qit, Headers: {simpMessageType=CONNECT, stompCommand=CONNECT, nativeHeaders={heart-beat=[10000,10000], accept-version=[1.1,1.0], host=[localhost:8080]}, simpSessionAttributes={}, simpHeartbeat=[J@63818546, simpSessionId=jxk10qit}
+2025-07-09 21:08:38 [clientOutboundChannel-3] INFO  c.t.T.c.WebSocketTestController - New WebSocket connection: session=jxk10qit, user=anonymous, total=2
+2025-07-09 21:08:38 [clientOutboundChannel-3] INFO  c.t.T.l.WebSocketEventListener - WebSocket connection established - Session ID: jxk10qit
+2025-07-09 21:08:48 [MessageBroker-6] INFO  o.s.w.s.c.WebSocketMessageBrokerStats - WebSocketSession[2 current WS(2)-HttpStream(0)-HttpPoll(0), 4 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(4)-CONNECTED(4)-DISCONNECT(1)], stompBrokerRelay[null], inboundChannel[pool size = 32, active threads = 0, queued tasks = 0, completed tasks = 36], outboundChannel[pool size = 4, active threads = 0, queued tasks = 0, completed tasks = 7], sockJsScheduler[pool size = 16, active threads = 1, queued tasks = 3, completed tasks = 8]
+2025-07-09 21:08:48 [MessageBroker-2] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=2, counter=7, message=Periodic update #7, timestamp=2025-07-09T21:08:48.477410900}
+2025-07-09 21:08:58 [MessageBroker-2] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=2, counter=8, message=Periodic update #8, timestamp=2025-07-09T21:08:58.479680600}
+2025-07-09 21:09:08 [MessageBroker-3] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=2, counter=9, message=Periodic update #9, timestamp=2025-07-09T21:09:08.474092900}
+2025-07-09 21:09:18 [MessageBroker-3] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=2, counter=10, message=Periodic update #10, timestamp=2025-07-09T21:09:18.474098300}
+2025-07-09 21:09:28 [MessageBroker-3] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=2, counter=11, message=Periodic update #11, timestamp=2025-07-09T21:09:28.480093400}
+2025-07-09 21:09:38 [MessageBroker-12] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=2, counter=12, message=Periodic update #12, timestamp=2025-07-09T21:09:38.481004500}
+2025-07-09 21:09:48 [MessageBroker-12] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=2, counter=13, message=Periodic update #13, timestamp=2025-07-09T21:09:48.484848900}
+2025-07-09 21:09:58 [MessageBroker-12] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=2, counter=14, message=Periodic update #14, timestamp=2025-07-09T21:09:58.484310800}
+2025-07-09 21:10:08 [MessageBroker-15] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=2, counter=15, message=Periodic update #15, timestamp=2025-07-09T21:10:08.480662800}
+2025-07-09 21:10:18 [MessageBroker-15] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=2, counter=16, message=Periodic update #16, timestamp=2025-07-09T21:10:18.483709500}
+2025-07-09 21:10:28 [MessageBroker-15] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=2, counter=17, message=Periodic update #17, timestamp=2025-07-09T21:10:28.474273100}
+2025-07-09 21:10:38 [MessageBroker-16] DEBUG c.t.T.c.WebSocketTestController - Sending periodic update: {activeSessions=2, counter=18, message=Periodic update #18, timestamp=2025-07-09T21:10:38.480721400}
+2025-07-09 21:10:38 [clientOutboundChannel-2] INFO  c.t.T.c.WebSocketTestController - WebSocket disconnected: session=jxk10qit, user=anonymous, remaining=1
+2025-07-09 21:10:38 [clientOutboundChannel-3] INFO  c.t.T.c.WebSocketTestController - WebSocket disconnected: session=fdswzrif, user=anonymous, remaining=0
+2025-07-09 21:10:38 [clientOutboundChannel-2] INFO  c.t.T.l.WebSocketEventListener - WebSocket connection closed - Session ID: jxk10qit
+2025-07-09 21:10:38 [clientOutboundChannel-3] INFO  c.t.T.l.WebSocketEventListener - WebSocket connection closed - Session ID: fdswzrif
+2025-07-09 21:10:38 [clientOutboundChannel-2] DEBUG c.t.Trading212.util.WebSocketUtils - INBOUND Command: DISCONNECT, Session: jxk10qit, Payload Type: byte[]
+2025-07-09 21:10:38 [clientOutboundChannel-3] DEBUG c.t.Trading212.util.WebSocketUtils - INBOUND Command: DISCONNECT, Session: fdswzrif, Payload Type: byte[]
+2025-07-09 21:10:43 [http-nio-8080-exec-7] INFO  c.t.T.c.WebSocketLoggingInterceptor - WebSocket connection attempt from: /[0:0:0:0:0:0:0:1]:12624 [Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0]
+2025-07-09 21:10:43 [http-nio-8080-exec-7] DEBUG c.t.T.c.WebSocketLoggingInterceptor - WebSocket Headers: [host:"localhost:8080", connection:"Upgrade", pragma:"no-cache", cache-control:"no-cache", user-agent:"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0", upgrade:"websocket", origin:"http://localhost:8080", sec-websocket-version:"13", accept-encoding:"gzip, deflate, br, zstd", accept-language:"en-US,en;q=0.9", sec-websocket-key:"kFbRoHXzSR7vB23U5u7aeQ==", sec-websocket-extensions:"permessage-deflate; client_max_window_bits"]
+2025-07-09 21:10:43 [http-nio-8080-exec-7] INFO  c.t.T.c.WebSocketLoggingInterceptor - WebSocket connection established: /[0:0:0:0:0:0:0:1]:12624
+2025-07-09 21:10:43 [http-nio-8080-exec-5] DEBUG c.t.Trading212.util.WebSocketUtils - INBOUND Command: CONNECT, Session: gfxha3xd, Headers: {simpMessageType=CONNECT, stompCommand=CONNECT, nativeHeaders={heart-beat=[10000,10000], accept-version=[1.1,1.0], host=[localhost:8080]}, simpSessionAttributes={}, simpHeartbeat=[J@2cac4243, simpSessionId=gfxha3xd}
+2025-07-09 21:10:43 [clientOutboundChannel-2] INFO  c.t.T.c.WebSocketTestController - New WebSocket connection: session=gfxha3xd, user=anonymous, total=1
+2025-07-09 21:10:43 [clientOutboundChannel-2] INFO  c.t.T.l.WebSocketEventListener - WebSocket connection established - Session ID: gfxha3xd
+2025-07-09 21:10:43 [http-nio-8080-exec-8] INFO  c.t.T.c.WebSocketLoggingInterceptor - WebSocket connection attempt from: /[0:0:0:0:0:0:0:1]:12625 [Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0]
+2025-07-09 21:10:43 [http-nio-8080-exec-8] DEBUG c.t.T.c.WebSocketLoggingInterceptor - WebSocket Headers: [host:"localhost:8080", connection:"Upgrade", pragma:"no-cache", cache-control:"no-cache", user-agent:"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0", upgrade:"websocket", origin:"http://localhost:8080", sec-websocket-version:"13", accept-encoding:"gzip, deflate, br, zstd", accept-language:"en-US,en;q=0.9", sec-websocket-key:"nSXPr4ytCMatQ3KnTCiutQ==", sec-websocket-extensions:"permessage-deflate; client_max_window_bits"]
+2025-07-09 21:10:43 [http-nio-8080-exec-8] INFO  c.t.T.c.WebSocketLoggingInterceptor - WebSocket connection established: /[0:0:0:0:0:0:0:1]:12625
+2025-07-09 21:10:43 [http-nio-8080-exec-6] DEBUG c.t.Trading212.util.WebSocketUtils - INBOUND Command: CONNECT, Session: ebd1lh0a, Headers: {simpMessageType=CONNECT, stompCommand=CONNECT, nativeHeaders={heart-beat=[10000,10000], accept-version=[1.1,1.0], host=[localhost:8080]}, simpSessionAttributes={}, simpHeartbeat=[J@45ebbede, simpSessionId=ebd1lh0a}
+2025-07-09 21:10:43 [clientOutboundChannel-4] INFO  c.t.T.c.WebSocketTestController - New WebSocket connection: session=ebd1lh0a, user=anonymous, total=2
+2025-07-09 21:10:43 [clientOutboundChannel-4] INFO  c.t.T.l.WebSocketEventListener - WebSocket connection established - Session ID: ebd1lh0a
+2025-07-09 21:10:46 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-07-09 21:10:46 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2025-07-09 21:10:46 [SpringApplicationShutdownHook] INFO  c.t.T.c.WebSocketTestController - WebSocket disconnected: session=ebd1lh0a, user=anonymous, remaining=1
+2025-07-09 21:10:46 [SpringApplicationShutdownHook] INFO  c.t.T.l.WebSocketEventListener - WebSocket connection closed - Session ID: ebd1lh0a
+2025-07-09 21:10:46 [SpringApplicationShutdownHook] DEBUG c.t.Trading212.util.WebSocketUtils - INBOUND Command: DISCONNECT, Session: ebd1lh0a, Payload Type: byte[]
+2025-07-09 21:10:46 [SpringApplicationShutdownHook] INFO  c.t.T.c.WebSocketTestController - WebSocket disconnected: session=gfxha3xd, user=anonymous, remaining=0
+2025-07-09 21:10:46 [SpringApplicationShutdownHook] INFO  c.t.T.l.WebSocketEventListener - WebSocket connection closed - Session ID: gfxha3xd
+2025-07-09 21:10:46 [SpringApplicationShutdownHook] DEBUG c.t.Trading212.util.WebSocketUtils - INBOUND Command: DISCONNECT, Session: gfxha3xd, Payload Type: byte[]
+2025-07-09 21:10:46 [SpringApplicationShutdownHook] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopping...
+2025-07-09 21:10:46 [SpringApplicationShutdownHook] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@5b3c11ce]]
+2025-07-09 21:10:46 [SpringApplicationShutdownHook] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopped.
+2025-07-09 21:10:49 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-07-09 21:10:49 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-07-09 21:10:49 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.

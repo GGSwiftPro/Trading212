@@ -110,7 +110,9 @@
                         <div class="d-flex align-items-center justify-content-between mb-4">
                             <div>
                                 <p class="text-muted mb-1">Available Balance</p>
-                                <div class="balance-display" id="balance">$0.00</div>
+                                <div class="balance-display">
+                                    <span id="balance">$0.00</span>
+                                </div>
                             </div>
                             <div class="text-end">
                                 <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#depositModal">
@@ -214,49 +216,83 @@
 
         // Format currency
         function formatCurrency(amount) {
+            // Ensure amount is a number
+            const numAmount = typeof amount === 'string' ? parseFloat(amount) : Number(amount);
+            
+            // Check if the amount is a valid number
+            if (isNaN(numAmount)) {
+                console.error('Invalid amount for formatting:', amount);
+                return '$0.00';
+            }
+            
             return new Intl.NumberFormat('en-US', {
                 style: 'currency',
                 currency: 'USD',
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
-            }).format(amount);
+            }).format(numAmount);
         }
 
         // Load user account data
         async function loadAccountData() {
             try {
-                // For now, we'll use the default user
+                console.log('Fetching user data from /api/users/current...');
                 const response = await fetch('/api/users/current');
+                
                 if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.error || 'Failed to load account data');
+                    let errorMessage = `HTTP error! Status: ${response.status}`;
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.error || errorMessage;
+                    } catch (e) {
+                        console.error('Error parsing error response:', e);
+                    }
+                    throw new Error(errorMessage);
                 }
                 
                 const userData = await response.json();
+                console.log('Received user data:', userData);
                 
                 if (!userData) {
-                    throw new Error('No user data received');
+                    throw new Error('No user data received from server');
                 }
                 
                 currentUser = userData;
                 
+                // Helper function to safely set text content
+                const setTextContent = (elementId, text) => {
+                    const element = document.getElementById(elementId);
+                    if (element) {
+                        element.textContent = text;
+                    } else {
+                        console.warn(`Element with ID '${elementId}' not found`);
+                    }
+                };
+                
                 // Update UI with user data
-                document.getElementById('username').textContent = currentUser.username || 'User';
-                document.getElementById('accountId').textContent = `#${currentUser.id || 'N/A'}`;
+                setTextContent('username', currentUser.username || 'User');
+                setTextContent('accountId', `#${currentUser.id || 'N/A'}`);
                 
                 // Format the last updated date or use current date if not available
                 const lastUpdated = currentUser.lastUpdated ? 
                     new Date(currentUser.lastUpdated) : new Date();
-                document.getElementById('lastUpdated').textContent = formatDate(lastUpdated.toISOString());
-                document.getElementById('memberSince').textContent = formatDate(lastUpdated.toISOString());
+                const formattedDate = formatDate(lastUpdated.toISOString());
+                
+                setTextContent('lastUpdated', formattedDate);
+                setTextContent('memberSince', formattedDate);
                 
                 // Format balance with 2 decimal places
                 const balance = currentUser.balance ? 
-                    parseFloat(currentUser.balance).toFixed(2) : '0.00';
-                document.getElementById('balance').textContent = formatCurrency(balance);
+                    parseFloat(currentUser.balance) : 0;
+                setTextContent('balance', formatCurrency(balance));
                 
                 // Load transactions
-                await loadTransactions();
+                try {
+                    await loadTransactions();
+                } catch (txError) {
+                    console.error('Error loading transactions:', txError);
+                    // Don't fail the whole function if transactions fail to load
+                }
                 
             } catch (error) {
                 console.error('Error loading account data:', error);
@@ -275,25 +311,58 @@
                     
                     // Remove the error message after 5 seconds
                     setTimeout(() => {
-                        errorDiv.remove();
+                        if (errorDiv.parentNode === container) {
+                            container.removeChild(errorDiv);
+                        }
                     }, 5000);
+                } else {
+                    console.warn('Could not find .account-container to show error');
                 }
                 
                 // Set default values in case of error
-                document.getElementById('username').textContent = 'User';
-                document.getElementById('accountId').textContent = '#N/A';
-                const now = new Date().toISOString();
-                document.getElementById('memberSince').textContent = formatDate(now);
-                document.getElementById('lastUpdated').textContent = formatDate(now);
-                document.getElementById('balance').textContent = formatCurrency('0.00');
+                const defaultDate = formatDate(new Date().toISOString());
+                const defaultValues = {
+                    'username': 'User',
+                    'accountId': '#N/A',
+                    'memberSince': defaultDate,
+                    'lastUpdated': defaultDate,
+                    'balance': formatCurrency('0.00')
+                };
+                
+                Object.entries(defaultValues).forEach(([id, value]) => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        element.textContent = value;
+                    }
+                });
             }
         }
 
         // Load user transactions
         async function loadTransactions() {
+            const transactionsContainer = document.getElementById('transactionsContainer');
+            
+            // If there's no transactions container, just log a warning and return
+            if (!transactionsContainer) {
+                console.warn('Transactions container not found');
+                return;
+            }
+            
             try {
+                // Show loading state
+                transactionsContainer.innerHTML = `
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Loading transactions...</p>
+                    </div>
+                `;
+                
                 // For now, we'll show a message since we don't have transaction history yet
-                const transactionsContainer = document.getElementById('transactionsContainer');
+                // This simulates a small delay for better UX
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
                 transactionsContainer.innerHTML = `
                     <div class="alert alert-info">
                         <i class="bi bi-info-circle-fill me-2"></i>
@@ -303,17 +372,25 @@
                 
                 // TODO: Implement actual transaction history when the backend is ready
                 // const response = await fetch(`/api/transactions?userId=${currentUser.id}`);
+                // if (!response.ok) {
+                //     throw new Error(`HTTP error! status: ${response.status}`);
+                // }
                 // const transactions = await response.json();
                 // renderTransactions(transactions);
                 
             } catch (error) {
                 console.error('Error loading transactions:', error);
-                document.getElementById('transactionsContainer').innerHTML = `
-                    <div class="alert alert-danger">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                        Failed to load transactions. Please try again later.
-                    </div>
-                `;
+                
+                // Only try to update the UI if the container still exists
+                if (document.body.contains(transactionsContainer)) {
+                    transactionsContainer.innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            Failed to load transactions. Please try again later.
+                            ${process.env.NODE_ENV === 'development' ? `<br><small>${error.message}</small>` : ''}
+                        </div>
+                    `;
+                }
             }
         }
 
@@ -532,7 +609,13 @@
         }
 
         // Initialize the page when loaded
-        document.addEventListener('DOMContentLoaded', loadAccountData);
+        if (document.readyState === 'loading') {
+            // Loading hasn't finished yet
+            document.addEventListener('DOMContentLoaded', loadAccountData);
+        } else {
+            // `DOMContentLoaded` has already fired
+            loadAccountData();
+        }
     </script>
 </body>
 </html>
