@@ -42,4 +42,7 @@ A full-stack cryptocurrency trading platform inspired by Trading212, featuring r
 
 2. Build and run the application
    -mvn spring-boot:run
-   
+
+3. Go to http://localhost:8080/index.html to open app
+
+4. 
