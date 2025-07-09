@@ -27,6 +27,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class KrakenWebSocketClient implements WebSocket.Listener {
@@ -38,6 +40,8 @@ public class KrakenWebSocketClient implements WebSocket.Listener {
             "XTZ/USD", "ATOM/USD", "FIL/USD"
     );
 
+    private static final Logger logger = LoggerFactory.getLogger(KrakenWebSocketClient.class);
+    
     private final CryptoRepository cryptoRepository;
     private final ObjectMapper objectMapper;
     private final SimpMessagingTemplate messagingTemplate;
@@ -55,43 +59,82 @@ public class KrakenWebSocketClient implements WebSocket.Listener {
 
     @PostConstruct
     public void startWebSocket() {
-        System.out.println("Attempting to connect to Kraken WebSocket API...");
+        logger.info("Initializing Kraken WebSocket client...");
+        logger.info("Attempting to connect to Kraken WebSocket API at: {}", KRAKEN_WEBSOCKET_URL);
+        logger.info("Subscribing to pairs: {}", KRAKEN_PAIRS);
         connectWebSocket();
     }
 
     private void connectWebSocket() {
         try {
+            logger.info("Creating new WebSocket connection to: {}", KRAKEN_WEBSOCKET_URL);
             webSocketFuture = httpClient.newWebSocketBuilder()
                     .buildAsync(URI.create(KRAKEN_WEBSOCKET_URL), this)
                     .thenApply(ws -> {
                         this.webSocket = ws;
+                        logger.info("WebSocket connection future completed");
                         return ws;
                     });
             
             // Wait for connection to be established
+            logger.info("Waiting for WebSocket connection to be established...");
             webSocketFuture.get(10, TimeUnit.SECONDS);
-            System.out.println("WebSocket connection established");
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            System.err.println("Failed to establish WebSocket connection: " + e.getMessage());
-            e.printStackTrace();
+            logger.info("WebSocket connection established and ready for use");
+        } catch (InterruptedException e) {
+            logger.error("WebSocket connection was interrupted: {}", e.getMessage());
+            Thread.currentThread().interrupt();
+            scheduleReconnect();
+        } catch (ExecutionException e) {
+            logger.error("Failed to establish WebSocket connection: {}", e.getCause() != null ? e.getCause().getMessage() : e.getMessage());
+            scheduleReconnect();
+        } catch (TimeoutException e) {
+            logger.error("WebSocket connection timed out after 10 seconds");
+            scheduleReconnect();
+        } catch (Exception e) {
+            logger.error("Unexpected error during WebSocket connection: {}", e.getMessage(), e);
             scheduleReconnect();
         }
     }
     @Override
     public void onOpen(WebSocket webSocket) {
-        System.out.println("Connected to Kraken WebSocket API");
-        webSocket.sendText(createSubscribeMessage(KRAKEN_PAIRS).orElse(""), true);
+        logger.info("WebSocket connection opened successfully to Kraken API");
+        String subscribeMessage = createSubscribeMessage(KRAKEN_PAIRS).orElse("");
+        if (!subscribeMessage.isEmpty()) {
+            logger.debug("Sending subscribe message: {}", subscribeMessage);
+            webSocket.sendText(subscribeMessage, true);
+            logger.info("Subscription message sent for {} pairs", KRAKEN_PAIRS.size());
+        } else {
+            logger.error("Failed to create subscription message");
+        }
     }
 
     @Override
     public CompletionStage<?> onText(WebSocket webSocket, CharSequence data, boolean last) {
         try {
-            System.out.println("Received message: " + data);
+            logger.trace("Received WebSocket message: {}", data);
             JsonNode rootNode = objectMapper.readTree(data.toString());
+            
+            // Log connection status messages
+            if (rootNode.has("event")) {
+                String eventType = rootNode.get("event").asText();
+                logger.info("WebSocket {}: {}", eventType, rootNode);
+                
+                if ("systemStatus".equals(eventType) || "subscriptionStatus".equals(eventType)) {
+                    String status = rootNode.path("status").asText("unknown");
+                    logger.info("WebSocket {} - Status: {}", eventType, status);
+                    
+                    if ("error".equals(status)) {
+                        logger.error("WebSocket error: {}", rootNode);
+                    }
+                }
+                return CompletableFuture.completedFuture(null);
+            }
+            
+            // Process price update messages
             processWebSocketMessage(rootNode);
-        } catch (IOException e) {
-            System.err.println("Error processing WebSocket message: " + e.getMessage());
-            e.printStackTrace();
+            
+        } catch (Exception e) {
+            logger.error("Error processing WebSocket message: {}", e.getMessage(), e);
         }
         return CompletableFuture.completedFuture(null);
     }
@@ -105,8 +148,7 @@ public class KrakenWebSocketClient implements WebSocket.Listener {
 
     @Override
     public void onError(WebSocket webSocket, Throwable error) {
-        System.err.println("WebSocket error: " + error.getMessage());
-        error.printStackTrace();
+        logger.error("WebSocket error: {}", error.getMessage(), error);
         scheduleReconnect();
     }
 
@@ -130,6 +172,8 @@ public class KrakenWebSocketClient implements WebSocket.Listener {
 
     private void processWebSocketMessage(JsonNode message) {
         try {
+            logger.trace("Processing WebSocket message: {}", message);
+            
             // Check if this is a ticker update message
             if (message.isArray() && message.size() >= 4) {
                 String pairName = message.get(3).asText();
@@ -141,20 +185,32 @@ public class KrakenWebSocketClient implements WebSocket.Listener {
                         String lastTradePrice = cNode.get(0).asText();
                         try {
                             BigDecimal newPrice = new BigDecimal(lastTradePrice);
-                            // Update the price in the database
-                            cryptoRepository.updatePrice(pairName, newPrice);
+                            logger.debug("Updating price for {} to {}", pairName, newPrice);
                             
-                            // Broadcast the price update to WebSocket subscribers
-                            CryptoPriceUpdate update = new CryptoPriceUpdate();
-                            update.setSymbol(pairName);
-                            update.setNewPrice(newPrice);
-                            update.setTimestamp(System.currentTimeMillis());
-                            
-                            // Send the update to the WebSocket topic
-                            messagingTemplate.convertAndSend("/topic/prices", update);
+                            try {
+                                // Update the price in the database
+                                cryptoRepository.updatePrice(pairName, newPrice);
+                                logger.debug("Successfully updated price for {} in database", pairName);
+                                
+                                // Broadcast the price update to WebSocket subscribers
+                                CryptoPriceUpdate update = new CryptoPriceUpdate();
+                                update.setSymbol(pairName);
+                                update.setNewPrice(newPrice);
+                                update.setTimestamp(System.currentTimeMillis());
+                                
+                                try {
+                                    // Send the update to the WebSocket topic
+                                    messagingTemplate.convertAndSend("/topic/prices", update);
+                                    logger.trace("Sent price update to WebSocket topic: {}", update);
+                                } catch (Exception e) {
+                                    logger.error("Failed to send price update to WebSocket topic: {}", e.getMessage(), e);
+                                }
+                            } catch (Exception e) {
+                                logger.error("Failed to update price for {} in database: {}", pairName, e.getMessage(), e);
+                            }
                             
                         } catch (NumberFormatException e) {
-                            System.err.println("Invalid price format for " + pairName + ": " + lastTradePrice);
+                            logger.error("Invalid price format for {}: {}", pairName, lastTradePrice, e);
                         }
                     }
                 }
@@ -166,15 +222,18 @@ public class KrakenWebSocketClient implements WebSocket.Listener {
     }
 
     private void scheduleReconnect() {
-        System.out.println("Scheduling reconnect in 5 seconds...");
+        int delaySeconds = 5;
+        logger.warn("Scheduling WebSocket reconnection in {} seconds...", delaySeconds);
         new Thread(() -> {
             try {
-                Thread.sleep(5000);
+                Thread.sleep(delaySeconds * 1000L);
+                logger.info("Attempting to reconnect to WebSocket...");
                 connectWebSocket();
             } catch (InterruptedException e) {
+                logger.warn("WebSocket reconnection thread was interrupted");
                 Thread.currentThread().interrupt();
             }
-        }).start();
+        }, "WebSocket-Reconnect-Thread").start();
     }
 
     @PreDestroy

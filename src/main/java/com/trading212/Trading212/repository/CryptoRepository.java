@@ -122,23 +122,79 @@ public class CryptoRepository {
         return cryptos.stream().findFirst();
     }
     
+    /**
+     * Updates a user's cryptocurrency holding by adding the specified quantity
+     * @param userId the ID of the user
+     * @param cryptoId the ID of the cryptocurrency
+     * @param quantity the quantity to add (can be negative to reduce holding)
+     */
     @Transactional
     public void updateUserHolding(Long userId, Long cryptoId, BigDecimal quantity) {
-        // First ensure the user_holdings table exists
+        if (userId == null || cryptoId == null || quantity == null) {
+            throw new IllegalArgumentException("User ID, crypto ID, and quantity must not be null");
+        }
+        
         ensureUserHoldingsTableExists();
         
-        // Check if the user already has a holding for this crypto
+        if (userHasExistingHolding(userId, cryptoId)) {
+            updateExistingHolding(userId, cryptoId, quantity);
+        } else {
+            insertNewHolding(userId, cryptoId, quantity);
+        }
+    }
+    
+    /**
+     * Checks if a user has an existing holding for a specific cryptocurrency
+     */
+    private boolean userHasExistingHolding(Long userId, Long cryptoId) {
         String checkSql = "SELECT COUNT(*) FROM user_holdings WHERE user_id = ? AND crypto_id = ?";
         int count = jdbcTemplate.queryForObject(checkSql, Integer.class, userId, cryptoId);
+        return count > 0;
+    }
+    
+    /**
+     * Updates an existing user holding by adding the specified quantity
+     */
+    private void updateExistingHolding(Long userId, Long cryptoId, BigDecimal quantity) {
+        String updateSql = """
+            UPDATE user_holdings 
+            SET quantity = GREATEST(0, quantity + ?) 
+            WHERE user_id = ? AND crypto_id = ?
+            """;
         
-        if (count > 0) {
-            // Update existing holding
-            String updateSql = "UPDATE user_holdings SET quantity = quantity + ? WHERE user_id = ? AND crypto_id = ?";
-            jdbcTemplate.update(updateSql, quantity, userId, cryptoId);
+        int updated = jdbcTemplate.update(updateSql, quantity, userId, cryptoId);
+        if (updated == 0) {
+            logger.warn("No rows were updated for user {} and crypto {}", userId, cryptoId);
         } else {
-            // Insert new holding
-            String insertSql = "INSERT INTO user_holdings (user_id, crypto_id, quantity) VALUES (?, ?, ?)";
-            jdbcTemplate.update(insertSql, userId, cryptoId, quantity);
+            logger.debug("Updated holding for user {} and crypto {} by {}", userId, cryptoId, quantity);
+        }
+    }
+    
+    /**
+     * Inserts a new user holding with the specified quantity
+     */
+    private void insertNewHolding(Long userId, Long cryptoId, BigDecimal quantity) {
+        if (quantity.compareTo(BigDecimal.ZERO) <= 0) {
+            logger.debug("Skipping insert for zero/negative quantity: user={}, crypto={}, quantity={}", 
+                userId, cryptoId, quantity);
+            return;
+        }
+        
+        String insertSql = """
+            INSERT INTO user_holdings (user_id, crypto_id, quantity) 
+            VALUES (?, ?, ?)
+            """;
+        
+        try {
+            int inserted = jdbcTemplate.update(insertSql, userId, cryptoId, quantity);
+            if (inserted > 0) {
+                logger.info("Created new holding: user={}, crypto={}, quantity={}", 
+                    userId, cryptoId, quantity);
+            }
+        } catch (Exception e) {
+            logger.error("Failed to insert new holding for user {} and crypto {}: {}", 
+                userId, cryptoId, e.getMessage());
+            throw e;
         }
     }
     
@@ -180,73 +236,111 @@ public class CryptoRepository {
         return cryptos.stream().findFirst();
     }
 
-    public List<CryptoCurrencyEntity> findAll() {
+    /**
+     * Finds all cryptocurrencies with pagination support
+     * @param limit maximum number of records to return
+     * @param offset number of records to skip
+     * @return list of cryptocurrencies
+     */
+    public List<CryptoCurrencyEntity> findAll(int limit, int offset) {
         try {
-            logger.info("Attempting to fetch all cryptocurrencies from database...");
+            logger.info("Fetching up to {} cryptocurrencies starting from offset {}...", limit, offset);
             
-            // First check if the table exists
             if (!tableExists("cryptocurrencies")) {
                 logger.warn("cryptocurrencies table does not exist!");
-                
-                // Log database schema for debugging
-                try {
-                    logger.info("Listing all tables in the database...");
-                    List<String> tables = jdbcTemplate.queryForList(
-                        "SHOW TABLES", String.class);
-                    logger.info("Available tables: {}", tables);
-                } catch (Exception e) {
-                    logger.error("Failed to list tables: {}", e.getMessage());
-                }
-                
+                logAvailableTables();
                 return List.of();
             }
             
-            // First try a simple count query
-            int count = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM cryptocurrencies", Integer.class);
-            logger.info("Found {} cryptocurrency records in the database", count);
+            final String countSql = "SELECT COUNT(*) FROM cryptocurrencies";
+            int totalCount = jdbcTemplate.queryForObject(countSql, Integer.class);
+            logger.info("Found {} total cryptocurrency records in the database", totalCount);
             
-            // If count is 0, return empty list early
-            if (count == 0) {
+            if (totalCount == 0) {
                 logger.info("No cryptocurrency records found in the database");
                 return List.of();
             }
             
-            // Now fetch the actual data
-            final String sql = "SELECT id, symbol, name, kraken_pair_name, current_price, last_updated FROM cryptocurrencies";
-            logger.debug("Executing query: {}", sql);
+            final String sql = """
+                SELECT id, symbol, name, kraken_pair_name, current_price, last_updated 
+                FROM cryptocurrencies 
+                ORDER BY symbol 
+                LIMIT ? OFFSET ?
+                """;
+                
+            logger.debug("Executing query: {} with limit={}, offset={}", sql, limit, offset);
             
-            List<CryptoCurrencyEntity> result = jdbcTemplate.query(sql, new CryptocurrencyRowMapper());
-            logger.info("Successfully retrieved {} cryptocurrency records", result.size());
+            List<CryptoCurrencyEntity> result = jdbcTemplate.query(
+                sql, 
+                new CryptocurrencyRowMapper(),
+                limit,
+                offset
+            );
             
-            // Log first few records for debugging
-            if (!result.isEmpty()) {
-                int logCount = Math.min(result.size(), 3);
-                logger.info("Sample records (first {}): {}", 
-                    logCount,
-                    result.subList(0, logCount).stream()
-                        .map(c -> String.format("%s (%s) = $%.2f", 
-                            c.getSymbol(), c.getName(), c.getCurrentPrice()))
-                        .toList()
-                );
-            }
-            
+            logRetrievedRecords(result);
             return result;
             
         } catch (Exception e) {
-            String errorMsg = "Error fetching all cryptocurrencies: " + e.getMessage();
-            logger.error(errorMsg, e);
-            
-            // Log database connection info
-            try {
-                String dbName = jdbcTemplate.queryForObject(
-                    "SELECT DATABASE()", String.class);
-                logger.info("Current database: {}", dbName);
-            } catch (Exception ex) {
-                logger.error("Failed to get current database name: {}", ex.getMessage());
-            }
-            
+            String errorMsg = String.format("Error fetching cryptocurrencies (limit=%d, offset=%d): %s", 
+                limit, offset, e.getMessage());
+            logDatabaseError(e, errorMsg);
             throw new RuntimeException(errorMsg, e);
+        }
+    }
+    
+    /**
+     * Finds all cryptocurrencies without pagination (use with caution for large datasets)
+     * @return list of all cryptocurrencies
+     */
+    public List<CryptoCurrencyEntity> findAll() {
+        // Default to a reasonable page size for backward compatibility
+        return findAll(1000, 0);
+    }
+    
+    /**
+     * Logs information about available tables in the database
+     */
+    private void logAvailableTables() {
+        try {
+            logger.info("Listing all tables in the database...");
+            List<String> tables = jdbcTemplate.queryForList(
+                "SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE()", 
+                String.class
+            );
+            logger.info("Available tables: {}", tables);
+        } catch (Exception e) {
+            logger.error("Failed to list tables: {}", e.getMessage());
+        }
+    }
+    
+    /**
+     * Logs information about retrieved cryptocurrency records
+     */
+    private void logRetrievedRecords(List<CryptoCurrencyEntity> records) {
+        if (!records.isEmpty()) {
+            int logCount = Math.min(records.size(), 3);
+            logger.info("Retrieved {} cryptocurrency records (showing first {}): {}", 
+                records.size(),
+                logCount,
+                records.subList(0, logCount).stream()
+                    .map(c -> String.format("%s ($%.2f)", c.getSymbol(), c.getCurrentPrice()))
+                    .toList()
+            );
+        } else {
+            logger.info("No cryptocurrency records found");
+        }
+    }
+    
+    /**
+     * Logs database connection errors with additional context
+     */
+    private void logDatabaseError(Exception e, String errorMsg) {
+        logger.error(errorMsg, e);
+        try {
+            String dbName = jdbcTemplate.queryForObject("SELECT DATABASE()", String.class);
+            logger.info("Current database: {}", dbName);
+        } catch (Exception ex) {
+            logger.error("Failed to get current database name: {}", ex.getMessage());
         }
     }
     

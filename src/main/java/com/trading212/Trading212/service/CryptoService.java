@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -21,15 +22,17 @@ import java.time.Instant;
 public class CryptoService {
     
     @Autowired
-    public CryptoService(CryptoRepository cryptoRepo, SimpMessagingTemplate messagingTemplate) {
+    public CryptoService(CryptoRepository cryptoRepo, SimpMessagingTemplate messagingTemplate, JdbcTemplate jdbcTemplate) {
         this.cryptoRepo = cryptoRepo;
         this.messagingTemplate = messagingTemplate;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     private static final Logger logger = LoggerFactory.getLogger(CryptoService.class);
     private final CryptoRepository cryptoRepo;
     private final SimpMessagingTemplate messagingTemplate;
     private final Map<String, BigDecimal> lastPrices = new HashMap<>();
+    private final JdbcTemplate jdbcTemplate;
 
     @PostConstruct
     public void init() {
@@ -147,6 +150,75 @@ public class CryptoService {
 
     public List<CryptoCurrencyEntity> getAllCryptocurrencies() {
         return cryptoRepo.findAll();
+    }
+    
+    public Map<String, Object> getDatabaseInfo() {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            // Get database name
+            String dbName = jdbcTemplate.queryForObject("SELECT DATABASE()", String.class);
+            response.put("database", dbName);
+            
+            // Get database version
+            String version = jdbcTemplate.queryForObject("SELECT VERSION()", String.class);
+            response.put("version", version);
+            
+            // List all tables
+            List<String> tables = jdbcTemplate.queryForList(
+                "SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE()", 
+                String.class
+            );
+            response.put("tables", tables);
+            
+            // Check if cryptocurrencies table exists
+            if (tables.contains("cryptocurrencies")) {
+                // Get table structure
+                List<Map<String, Object>> columns = jdbcTemplate.queryForList(
+                    "SHOW COLUMNS FROM cryptocurrencies"
+                );
+                response.put("cryptocurrencies_columns", columns);
+                
+                // Get row count
+                int count = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM cryptocurrencies", Integer.class);
+                response.put("cryptocurrencies_count", count);
+                
+                // Get sample data if any
+                if (count > 0) {
+                    List<Map<String, Object>> sampleData = jdbcTemplate.queryForList(
+                        "SELECT * FROM cryptocurrencies LIMIT 5");
+                    response.put("cryptocurrencies_sample", sampleData);
+                }
+            }
+            
+            return response;
+            
+        } catch (Exception e) {
+            response.put("error", e.getMessage());
+            response.put("error_type", e.getClass().getName());
+            throw new RuntimeException("Database operation failed", e);
+        }
+    }
+    
+    public String testDatabaseConnection() {
+        try {
+            logger.info("Testing database connection...");
+            
+            // Test basic connection
+            String dbName = jdbcTemplate.queryForObject("SELECT DATABASE()", String.class);
+            logger.info("Connected to database: {}", dbName);
+            
+            // Test table access
+            List<CryptoCurrencyEntity> cryptos = getAllCryptocurrencies();
+            logger.info("Successfully connected to database. Found {} cryptocurrencies.", cryptos.size());
+            
+            return "Database connection successful! Found " + cryptos.size() + " cryptocurrencies in database: " + dbName;
+        } catch (Exception e) {
+            String errorMsg = "Database connection failed: " + e.getMessage();
+            logger.error(errorMsg, e);
+            throw new RuntimeException(errorMsg, e);
+        }
     }
 
     public Optional<CryptoCurrencyEntity> getCryptocurrencyByKrakenPair(String krakenPairName) {
